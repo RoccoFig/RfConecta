@@ -1,4 +1,3 @@
-
 @app.post("/l/<slug>/baja")
 def baja(slug):
     com = comercio(slug)
@@ -112,4 +111,4 @@ def inicio():
 
 init_db()
 if __name__ == "__main__":
-    app.run(debug=True) 
+    app.run(debug=True)
