@@ -26,14 +26,18 @@
 .d-balcarce .bc-tarjeta h2{color:#fff;margin:0}
 .bc-cuenta{margin:0;font-size:.95rem;color:rgba(255,255,255,.5)}
 .bc-cuenta strong{font-size:1.8rem;font-weight:800;letter-spacing:-.03em;color:#fff}
-.bc-sellos{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(var(--cols,5),1fr);gap:.7rem;position:relative}
-.bc-sellos li{aspect-ratio:1;border-radius:50%;border:1.5px solid rgba(255,255,255,.2);display:grid;place-items:center;
-  font-size:.8rem;font-weight:600;color:rgba(255,255,255,.4)}
-.bc-sellos li.on{background:var(--acento);border-color:var(--acento);color:var(--tinta)}
-.bc-sellos li.premio{border-style:dashed;border-color:var(--acento);color:var(--acento);font-size:1rem}
-.bc-sellos svg{width:56%;height:56%;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
-.bc-sellos li.nuevo{animation:bc-sello .5s cubic-bezier(.2,.8,.3,1.3)}
-@keyframes bc-sello{from{transform:scale(.4);opacity:0}to{transform:none;opacity:1}}
+.bc-sellos{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(var(--cols,5),1fr);gap:.5rem .6rem;position:relative}
+.bc-sellos li{display:flex;flex-direction:column;align-items:center;gap:.15rem;color:rgba(255,255,255,.28)}
+.bc-sellos li.on{color:var(--acento)}
+.bc-sellos li.premio{color:var(--acento)}
+.bc-sellos svg{width:100%;max-width:56px;aspect-ratio:1;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.bc-sellos li.premio svg{stroke-dasharray:3 3}
+.bc-vapor{opacity:.6}
+.bc-sellos span{font-size:.68rem;font-weight:600;letter-spacing:.08em;color:rgba(255,255,255,.4)}
+.bc-sellos li.on span{color:rgba(255,255,255,.75)}
+.bc-sellos li.premio span{color:var(--acento);font-size:.8rem}
+.bc-sellos li.nuevo svg{animation:bc-sello .5s cubic-bezier(.2,.8,.3,1.3)}
+@keyframes bc-sello{from{transform:translateY(8px) scale(.6);opacity:0}to{transform:none;opacity:1}}
 .bc-pie{margin:1.1rem 0 0;font-size:.92rem;color:rgba(255,255,255,.7);position:relative}
 .bc-pie strong{color:#fff;font-weight:600}
 .bc-tarjeta.completa .bc-pie strong{color:var(--acento)}

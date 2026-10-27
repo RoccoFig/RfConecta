@@ -1,0 +1,15 @@
+{# Balcarce · tarjeta negra como el logo y una taza de café por visita; las llenas se tiñen del naranja del lobo marino #}
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<symbol id="bc-vacia" viewBox="0 0 48 48"><path d="M9 19h25v9a12.5 12.5 0 0 1-25 0z"/><path d="M34 22h3.5a5 5 0 0 1 0 10H33"/><path d="M7 44h30"/></symbol>
+<symbol id="bc-llena" viewBox="0 0 48 48"><path d="M9 19h25v9a12.5 12.5 0 0 1-25 0z" fill="currentColor"/><path d="M34 22h3.5a5 5 0 0 1 0 10H33"/><path d="M7 44h30"/><path d="M16 14c-1.5-2 1.5-3 0-6M22 14c-1.5-2 1.5-3 0-6M28 14c-1.5-2 1.5-3 0-6" class="bc-vapor"/></symbol>
+</defs></svg>
+<section class="tarjeta bc-tarjeta{{ ' completa' if sellos >= tarjeta }}" aria-labelledby="bc-t">
+  <div class="bc-cab">
+    <h2 id="bc-t">Tu tarjeta</h2>
+    <p class="bc-cuenta"><strong>{{ sellos }}</strong> / {{ tarjeta }}</p>
+  </div>
+  <ol class="bc-sellos" style="--cols:{{ 5 if tarjeta % 5 == 0 else 4 }}" role="img" aria-label="{{ sellos }} de {{ tarjeta }} tazas">
+    {% for i in range(tarjeta) %}<li class="{{ 'on' if i < sellos else ('premio' if i == tarjeta - 1) }}{{ ' nuevo' if i == sellos - 1 and sumo }}"><svg aria-hidden="true"><use href="#bc-{{ 'llena' if i < sellos else 'vacia' }}"/></svg><span>{{ '★' if i == tarjeta - 1 else i + 1 }}</span></li>{% endfor %}
+  </ol>
+  <p class="bc-pie">{% if sellos >= tarjeta %}¡Completa! Pedí en caja tu <strong>{{ premio_tarjeta }}</strong>.{% else %}Te {{ 'falta' if tarjeta - sellos == 1 else 'faltan' }} {{ tarjeta - sellos }} para <strong>{{ premio_tarjeta }}</strong>.{% endif %}</p>
+</section>
