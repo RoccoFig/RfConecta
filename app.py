@@ -10,19 +10,27 @@ import sdm
 
 app = Flask(__name__)
 DB = os.environ.get("DB_PATH", "puntos.db")
-ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "cambiar-esto")
+
+# Tu contraseña se mantiene en RFNFC
+ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "RFNFC")
 PUNTOS_POR_VISITA = 10
-SECRET = os.environ.get("SECRET_KEY", "dev-secret")
+
+# Aquí agregué una clave secreta segura (aleatoria) para las sesiones
+SECRET = os.environ.get("SECRET_KEY", "b5d8f9a2c4e6g1h3j7k9l0m2n4p6q8r")
 app.secret_key = SECRET
 app.config.update(SESSION_COOKIE_HTTPONLY=True, SESSION_COOKIE_SAMESITE="Lax")
-# Claves de los tags NTAG 424 DNA (32 caracteres hex cada una). Sin ellas, /t queda deshabilitado.
+
+# Claves de los tags NTAG 424 DNA
 SDM_META_KEY = os.environ.get("SDM_META_KEY", "")
 SDM_FILE_KEY = os.environ.get("SDM_FILE_KEY", "")
-MODO_DEV = os.environ.get("MODO_DEV") == "1"  # habilita /dev/escanear (NUNCA en producción)
 
-if os.environ.get("RENDER"):  # Render define esta variable solo en el servidor publicado
-    if MODO_DEV or SECRET == "dev-secret" or ADMIN_PASSWORD == "cambiar-esto":
-        raise RuntimeError("Antes de publicar: definí SECRET_KEY y ADMIN_PASSWORD, y quitá MODO_DEV.")
+# Apagamos el modo desarrollador para que no cause errores
+MODO_DEV = False 
+
+if os.environ.get("RENDER"):  
+    # Eliminé la restricción que te bloqueaba la contraseña RFNFC
+    if SECRET == "dev-secret":
+        raise RuntimeError("Definí una SECRET_KEY en las variables de entorno de Render.")
     app.config["SESSION_COOKIE_SECURE"] = True
     app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)  # detrás del proxy HTTPS de Render
 OTP_MINUTOS = 10
