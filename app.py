@@ -7,8 +7,6 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 
 import sdm
 
-import Flask
-
 app = Flask(__name__)
 DB = os.environ.get("DB_PATH", "puntos.db")
 
