@@ -1,0 +1,39 @@
+/* Balcarce — minimalista: blanco cálido, el negro del logo y el naranja del lobo marino como único acento. */
+.d-balcarce{--fondo:#f6f4f0;--tinta:#141414;--acento:#f25a1e;--linea:#e4e0d8;--sup:#fff;--radio:14px;
+  --fuente:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;--titulo:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.d-balcarce .marca{background:transparent;color:var(--tinta);max-width:30rem;margin:0 auto;gap:.8rem;
+  padding:max(1.4rem,env(safe-area-inset-top)) 1.25rem .2rem}
+.d-balcarce .marca img{width:52px;height:52px;border-radius:50%;object-fit:cover;box-shadow:0 4px 14px -6px rgba(20,20,20,.45)}
+.d-balcarce .marca strong{font-size:1rem;font-weight:800;letter-spacing:.16em;text-transform:uppercase}
+.d-balcarce .marca small{font-size:.85rem;opacity:.55}
+.d-balcarce h1{font-weight:700;font-size:1.9rem;letter-spacing:-.025em}
+.d-balcarce h2{font-size:.75rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;opacity:.55}
+.d-balcarce .tarjeta{border:0;box-shadow:0 1px 2px rgba(20,20,20,.05),0 10px 28px -14px rgba(20,20,20,.18)}
+.d-balcarce .puntos{font-weight:800;font-size:3.6rem;letter-spacing:-.04em}
+.d-balcarce .aviso{border-left:0;background:#fff0e8;color:#7a2a0b}
+.d-balcarce .fila{padding:.85rem 0}
+.d-balcarce .codigo{color:var(--acento)}
+.d-balcarce input{background:var(--sup)}
+.d-balcarce button{border-radius:999px;transition:background .15s}
+.d-balcarce button:not(.sec):not(:disabled):hover{background:var(--acento)}
+.d-balcarce button:disabled{background:#ece9e3;color:#9a958c}
+
+/* La tarjeta de sellos: negra como el logo, con un aro naranja que asoma en la esquina */
+.bc-tarjeta{background:var(--tinta);color:#fff;padding:1.3rem 1.3rem 1.1rem;position:relative;overflow:hidden}
+.bc-tarjeta::before{content:"";position:absolute;right:-70px;top:-70px;width:190px;height:190px;border-radius:50%;
+  border:2px solid var(--acento);opacity:.35;pointer-events:none}
+.bc-cab{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:1rem;position:relative}
+.d-balcarce .bc-tarjeta h2{color:#fff;margin:0}
+.bc-cuenta{margin:0;font-size:.95rem;color:rgba(255,255,255,.5)}
+.bc-cuenta strong{font-size:1.8rem;font-weight:800;letter-spacing:-.03em;color:#fff}
+.bc-sellos{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(var(--cols,5),1fr);gap:.7rem;position:relative}
+.bc-sellos li{aspect-ratio:1;border-radius:50%;border:1.5px solid rgba(255,255,255,.2);display:grid;place-items:center;
+  font-size:.8rem;font-weight:600;color:rgba(255,255,255,.4)}
+.bc-sellos li.on{background:var(--acento);border-color:var(--acento);color:var(--tinta)}
+.bc-sellos li.premio{border-style:dashed;border-color:var(--acento);color:var(--acento);font-size:1rem}
+.bc-sellos svg{width:56%;height:56%;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.bc-sellos li.nuevo{animation:bc-sello .5s cubic-bezier(.2,.8,.3,1.3)}
+@keyframes bc-sello{from{transform:scale(.4);opacity:0}to{transform:none;opacity:1}}
+.bc-pie{margin:1.1rem 0 0;font-size:.92rem;color:rgba(255,255,255,.7);position:relative}
+.bc-pie strong{color:#fff;font-weight:600}
+.bc-tarjeta.completa .bc-pie strong{color:var(--acento)}
