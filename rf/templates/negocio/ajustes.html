@@ -1,0 +1,20 @@
+{% extends "panel/layout.html" %}{% import "panel/_ui.html" as ui with context %}
+{% block cuerpo %}
+<nav class="tabs" aria-label="Ajustes">{% for k, v in [('programa', 'Programa de lealtad'), ('cuenta', 'Cuenta')] %}<a href="{{ ruta('ajustes', tab=k) }}" {% if tab == k %}aria-current="page"{% endif %}>{{ v }}</a>{% endfor %}</nav>
+{% if tab == 'programa' %}
+<div class="rejilla"><section class="panel c7"><div class="panel-h"><div><h2>Reglas del programa</h2><p class="sub">Cómo ganan puntos y sellos tus clientes.</p></div></div><div class="panel-c">
+<form method="post" action="{{ ruta('ajustes_reglas') }}">{{ csrf_input() }}<div class="form-g">
+<label class="campo"><span>Puntos por visita</span><input name="puntos_visita" type="number" min="1" max="1000" value="{{ r.puntos }}" required></label>
+<label class="campo"><span>Sellos para completar la tarjeta</span><input name="sellos_tarjeta" type="number" min="2" max="20" value="{{ r.sellos }}" required></label>
+<label class="campo ancho"><span>Premio al completar la tarjeta</span><input name="premio_tarjeta" value="{{ r.premio }}" required maxlength="60"></label></div>
+<p style="color:var(--muted);margin-bottom:14px">Si cambiás la cantidad de sellos, las tarjetas que tus clientes tienen en curso se recalculan.</p><button class="btn acento">Guardar reglas</button></form></div></section>
+<aside class="panel c5"><div class="panel-h"><h2>Cómo funciona</h2></div><div class="panel-c"><p style="margin-bottom:10px">Cada vez que un cliente apoya el celular en tu cartel suma <b>{{ r.puntos }} puntos</b> y <b>1 sello</b>. Hay un tiempo de espera entre visitas para evitar abusos.</p><p style="color:var(--muted)">Al completar los {{ r.sellos }} sellos, el cliente gana automáticamente <b>{{ r.premio }}</b>.</p></div></aside></div>
+{% else %}
+<div class="rejilla"><section class="panel c6"><div class="panel-h"><h2>Cambiar la clave</h2></div><div class="panel-c">
+<form method="post" action="{{ ruta('ajustes_clave') }}">{{ csrf_input() }}
+{% if not soporte %}<label class="campo"><span>Clave actual</span><input type="password" name="actual" required autocomplete="current-password"></label>{% endif %}
+<label class="campo"><span>Clave nueva <small>(mínimo 8 caracteres)</small></span><input type="password" name="nueva" required minlength="8" autocomplete="new-password"></label><button class="btn">Actualizar clave</button></form></div></section>
+<aside class="panel c6"><div class="panel-h"><h2>Tu negocio</h2></div><div class="panel-c"><div class="estado-lista"><div class="e"><div><small>Nombre</small><b>{{ com.nombre }}</b></div></div><div class="e"><div><small>Pantalla de tus clientes</small><b>/l/{{ com.slug }}</b></div></div></div>
+<p style="color:var(--muted);margin-top:14px">Para cambiar el nombre, el logo o el diseño, escribinos.</p></div></aside></div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,26 @@
+/* Café Brasa — editorial, cálido y sobrio. Papel crema, tinta de tostado y un solo acento cobre. */
+.d-cafe-brasa{background:#f4ebdd radial-gradient(1200px 500px at 50% -10%,#fbf5ea,transparent)}
+.d-cafe-brasa .marca{background:transparent;color:var(--tinta);flex-direction:column;align-items:flex-start;gap:.5rem;
+  border-bottom:2px solid var(--tinta);margin:0 1.25rem;padding:1.4rem 0 1rem;max-width:30rem}
+@media(min-width:34rem){.d-cafe-brasa .marca{margin:0 auto}}
+.d-cafe-brasa .marca img{width:44px;height:44px}
+.d-cafe-brasa .marca strong{font:700 2.1rem/1 Georgia,Cambria,serif;letter-spacing:-.02em}
+.d-cafe-brasa .marca small{font:italic 1rem Georgia,serif;opacity:.8}
+.d-cafe-brasa h1{font:italic 400 2.1rem/1.1 Georgia,Cambria,serif;letter-spacing:-.02em}
+.d-cafe-brasa .tarjeta{border-radius:4px;box-shadow:0 1px 0 #dccbb2}
+.d-cafe-brasa .puntos{font:400 4.2rem/1 Georgia,Cambria,serif;color:var(--acento)}
+.d-cafe-brasa button{border-radius:2px;letter-spacing:.06em;text-transform:uppercase;font-size:.82rem}
+.cb-tarjeta{background:#e9d6b8 repeating-linear-gradient(0deg,rgba(43,26,16,.035) 0 1px,transparent 1px 4px);border:1px solid #c9ad84;position:relative}
+.cb-tarjeta::before,.cb-tarjeta::after{content:"";position:absolute;top:50%;width:18px;height:18px;border-radius:50%;background:var(--fondo);border:1px solid #c9ad84;transform:translateY(-50%)}
+.cb-tarjeta::before{left:-10px;clip-path:inset(0 0 0 50%)}.cb-tarjeta::after{right:-10px;clip-path:inset(0 50% 0 0)}
+.cb-eyebrow{display:flex;justify-content:space-between;margin:0 0 .35rem;font:600 .68rem/1 system-ui,sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#7a5a3a}
+.cb-tarjeta h2{font:italic 400 1.6rem/1.15 Georgia,serif;margin:0 0 .8rem}
+.cb-tazas{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(4,1fr);gap:.4rem .5rem}
+.cb-tazas li{display:flex;flex-direction:column;align-items:center;color:#a98b66}
+.cb-tazas li.on{color:var(--acento)}
+.cb-tazas svg{width:100%;max-width:64px;aspect-ratio:1;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.cb-tazas li.on svg{color:#7a3f17}.cb-tazas li.on{color:#b0612a}
+.cb-tazas span{font:600 .7rem system-ui,sans-serif;letter-spacing:.1em;color:#7a5a3a}
+.cb-tazas li.ultima svg{animation:cb-subir .5s cubic-bezier(.2,.8,.3,1.2)}
+@keyframes cb-subir{from{transform:translateY(8px) scale(.85);opacity:0}to{transform:none;opacity:1}}
+.cb-pie{margin:.8rem 0 0;font:1rem Georgia,serif;border-top:1px dashed #a98b66;padding-top:.7rem}.cb-pie em{color:#7a3f17}

@@ -1,0 +1,13 @@
+{# Café Brasa · tarjeta de degustación: papel kraft, tipografía editorial y una taza por visita #}
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<symbol id="cb-vacia" viewBox="0 0 48 48"><path d="M10 20h24v7a12 12 0 0 1-24 0z"/><path d="M34 23h3a5 5 0 0 1 0 10h-4"/><path d="M8 43h32"/></symbol>
+<symbol id="cb-llena" viewBox="0 0 48 48"><path d="M10 20h24v7a12 12 0 0 1-24 0z" fill="currentColor"/><path d="M34 23h3a5 5 0 0 1 0 10h-4"/><path d="M8 43h32"/><path d="M17 15c-1.5-2 1.5-3 0-6M24 15c-1.5-2 1.5-3 0-6M31 15c-1.5-2 1.5-3 0-6" opacity=".55"/></symbol>
+</defs></svg>
+<section class="tarjeta cb-tarjeta" aria-labelledby="cb-t">
+  <p class="cb-eyebrow"><span>Tarjeta de degustación</span><span>Nº {{ '%04d'|format(c.id) }}</span></p>
+  <h2 id="cb-t">{% if sellos >= tarjeta %}Tarjeta completa{% else %}Una taza por visita{% endif %}</h2>
+  <ol class="cb-tazas" role="img" aria-label="{{ sellos }} de {{ tarjeta }} sellos">
+    {% for i in range(tarjeta) %}<li class="{{ 'on' if i < sellos }}{{ ' ultima' if i == sellos - 1 and sumo }}"><svg aria-hidden="true"><use href="#cb-{{ 'llena' if i < sellos else 'vacia' }}"/></svg><span>{{ i + 1 }}</span></li>{% endfor %}
+  </ol>
+  <p class="cb-pie">{% if sellos >= tarjeta %}Pedí tu premio en la caja: <em>{{ premio_tarjeta }}</em>.{% else %}Te {{ 'falta' if tarjeta - sellos == 1 else 'faltan' }} {{ tarjeta - sellos }} para <em>{{ premio_tarjeta }}</em>.{% endif %}</p>
+</section>

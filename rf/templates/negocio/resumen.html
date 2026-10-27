@@ -1,0 +1,29 @@
+{% extends "panel/layout.html" %}{% import "panel/_ui.html" as ui with context %}
+{% block acciones %}<button class="btn acento" data-abrir="dlg-validar">{{ ui.ico('ticket') }}Validar un código</button>{% endblock %}
+{% block cuerpo %}
+<div class="rejilla">
+  <div class="c3">{{ ui.kpi("Clientes", k.clientes, k.nuevos7 ~ " nuevos en 7 días", "users") }}</div>
+  <div class="c3">{{ ui.kpi("Visitas en 7 días", k.visitas7, "vs. los 7 días anteriores" if k.delta_visitas is not none else "Primera semana de datos", "scan-line", k.delta_visitas) }}</div>
+  <div class="c3">{{ ui.kpi("Clientes que vuelven", (k.retorno ~ '%') if k.retorno is not none else '—', k.recurrentes ~ " de " ~ k.con_visita ~ " vinieron 2 o más veces", "trending-up") }}</div>
+  <div class="c3">{{ ui.kpi("Canjes por entregar", k.pendientes, "Ver los pendientes" if k.pendientes else "Todo entregado", "gift") }}</div>
+</div>
+<div class="rejilla">
+  <section class="panel c8"><div class="panel-h"><div><h2>Visitas por día</h2><p class="sub">{{ total_periodo }} visitas en los últimos {{ dias }} días</p></div>
+    <div class="acciones">{% for d in (7, 30, 90) %}<a class="btn chico {{ '' if d == dias else 'sec' }}" href="{{ ruta('resumen', dias=d) }}" {% if d == dias %}aria-current="true"{% endif %}>{{ d }} días</a>{% endfor %}</div></div>
+    <div class="panel-c">{{ grafico }}<div class="g-ejes"><span>{{ et[0] }}</span><span>{{ et[(et|length) // 2] }}</span><span>{{ et[-1] }} · hoy</span></div></div></section>
+  <section class="panel c4"><div class="panel-h"><h2>Premios más pedidos</h2></div><div class="panel-c">
+    {% if populares %}<ol class="ranking">{% for p in populares %}<li><span></span><b>{{ p.nombre }}</b><span>{{ p.n }}</span><div class="barra-r"><i style="width:{{ (100 * p.n / populares[0].n)|round|int }}%"></i></div></li>{% endfor %}</ol>
+    {% else %}<p style="color:var(--muted)">Cuando tus clientes canjeen premios, vas a ver cuáles prefieren.</p>{% endif %}</div></section>
+</div>
+<div class="rejilla">
+  <section class="panel c7"><div class="panel-h"><h2>Actividad reciente</h2><a class="btn sec chico" href="{{ ruta('actividad') }}">Ver todo</a></div>
+    <div class="panel-c">{% if reciente %}{{ ui.actividad_lista(reciente) }}{% else %}{% call ui.vacio("Todavía no hay actividad", "Cuando un cliente apoye el celular en tu cartel, la visita aparece acá.", "activity") %}{% endcall %}{% endif %}</div></section>
+  <section class="panel c5"><div class="panel-h"><h2>Tu programa</h2><a class="btn sec chico" href="{{ ruta('ajustes') }}">Cambiar</a></div><div class="panel-c"><div class="estado-lista">
+    <div class="e"><div><b>{{ reglas[0] }} puntos por visita</b><small>Se suman cuando el cliente apoya el celular en el cartel</small></div></div>
+    <div class="e"><div><b>Tarjeta de {{ reglas[1] }} sellos</b><small>Premio al completarla: {{ reglas[2] }}</small></div></div>
+    <div class="e"><div><b>{{ ntags }} {{ 'cartel activo' if ntags == 1 else 'carteles activos' }}</b><small>{% if ntags %}<a href="{{ ruta('carteles') }}">Ver carteles</a>{% else %}<a href="{{ ruta('carteles') }}">Registrá tu primer cartel</a>{% endif %}</small></div></div></div></div></section>
+</div>
+{% call ui.dialogo("dlg-validar", "Validar un código", "Entregar premio", ruta("canje_validar")) %}
+<p style="margin-bottom:12px;color:var(--muted)">Pedile el código al cliente y escribilo para marcar el premio como entregado.</p>
+<input type="hidden" name="volver" value="{{ ruta('resumen') }}"><label class="campo"><span>Código del cliente</span><input name="codigo" class="mono" required maxlength="12" autocomplete="off" placeholder="A1B2C3"></label>{% endcall %}
+{% endblock %}

@@ -1,0 +1,14 @@
+{% extends "panel/layout.html" %}{% import "panel/_ui.html" as ui with context %}
+{% block cuerpo %}
+<div class="rejilla"><section class="panel c7"><div class="panel-h"><h2>Datos del negocio</h2></div><div class="panel-c">
+<form method="post">{{ csrf_input() }}<div class="form-g">
+<label class="campo ancho"><span>Nombre del negocio</span><input name="nombre" value="{{ f.nombre }}" required maxlength="60" autofocus></label>
+<label class="campo"><span>Rubro</span><select name="categoria">{% for r in rubros %}<option {{ 'selected' if f.categoria == r }}>{{ r }}</option>{% endfor %}</select></label>
+<label class="campo"><span>Dominio propio <small>(opcional)</small></span><input name="dominio" value="{{ f.dominio }}" placeholder="micafe.com" autocomplete="off"></label>
+<label class="campo ancho"><span>Frase corta <small>(opcional)</small></span><input name="tagline" value="{{ f.tagline }}" maxlength="80" placeholder="Café de especialidad"></label>
+<label class="campo ancho"><span>Clave inicial del dueño <small>(mínimo 8 caracteres)</small></span><input type="password" name="clave" required minlength="8" autocomplete="new-password"></label></div>
+<button class="btn acento">Crear negocio</button></form></div></section>
+<aside class="panel c5"><div class="panel-h"><h2>Cómo sigue</h2></div><div class="panel-c">
+<p style="margin-bottom:10px">Cada negocio recibe un diseño propio, hecho en código. Al crearlo queda con un tema base neutro, y desde la pestaña <b>Diseño</b> vas a ver cómo armar el suyo.</p>
+<p style="color:var(--muted)">La clave que elijas es la que usará el dueño para entrar a su panel. Podés cambiarla cuando quieras.</p></div></aside></div>
+{% endblock %}

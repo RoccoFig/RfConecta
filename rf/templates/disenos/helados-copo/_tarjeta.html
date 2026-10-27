@@ -1,0 +1,13 @@
+{# Helados Copo · cada visita es una bocha nueva en tu cucurucho #}
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<symbol id="hc-vacio" viewBox="0 0 40 58"><path d="M8 26h24L20 55z" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/><circle cx="20" cy="18" r="12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-dasharray="3 4"/></symbol>
+<symbol id="hc-lleno" viewBox="0 0 40 58"><path d="M8 26h24L20 55z" fill="#f4b86a" stroke="#d98f3a" stroke-width="1.8" stroke-linejoin="round"/><path d="M14 31l6 15M21 29l5 11" stroke="#d98f3a" stroke-width="1.4" stroke-linecap="round"/><circle cx="20" cy="18" r="12" fill="currentColor"/><circle cx="15.5" cy="13.5" r="3.2" fill="#fff" opacity=".5"/></symbol>
+</defs></svg>
+<section class="tarjeta hc-tarjeta" aria-labelledby="hc-t">
+  <h2 id="hc-t">Armá tu cucurucho {{ t.icono }}</h2>
+  <ol class="hc-fila" role="img" aria-label="{{ sellos }} de {{ tarjeta }} bochas">
+    {% for i in range(tarjeta) %}<li class="{{ 'on c' ~ (i % 4) if i < sellos }}{{ ' nueva' if i == sellos - 1 and sumo }}"><svg aria-hidden="true"><use href="#hc-{{ 'lleno' if i < sellos else 'vacio' }}"/></svg></li>{% endfor %}
+  </ol>
+  <div class="hc-barra" aria-hidden="true"><i style="width:{{ (100 * sellos / tarjeta)|round|int }}%"></i></div>
+  <p class="hc-pie">{% if sellos >= tarjeta %}¡Cucurucho completo! Pedí tu premio: <b>{{ premio_tarjeta }}</b>{% else %}<b>{{ sellos }}</b> de {{ tarjeta }} bochas · al completar ganás <b>{{ premio_tarjeta }}</b>{% endif %}</p>
+</section>

@@ -1,0 +1,22 @@
+/* Helados Copo — redondo, jugoso y con colores de sabores. Todo es blando y un poco exagerado a propósito. */
+.d-helados-copo{background:#fff1f6 radial-gradient(circle at 15% 8%,#ffe0ec 0 120px,transparent 121px),radial-gradient(circle at 92% 22%,#d9f7ee 0 90px,transparent 91px)}
+.d-helados-copo .marca{background:var(--tinta);margin:.8rem;border-radius:26px;padding:.8rem 1.1rem}
+.d-helados-copo .marca strong{font:800 1.35rem/1.1 "Trebuchet MS",Verdana,sans-serif}
+.d-helados-copo h1{font:800 2rem/1.1 "Trebuchet MS",Verdana,sans-serif;letter-spacing:-.02em}
+.d-helados-copo h1::after{content:" 🍨"}
+.d-helados-copo .tarjeta{border:2px solid var(--tinta);box-shadow:5px 5px 0 var(--tinta)}
+.d-helados-copo .puntos{color:#e0245e}
+.d-helados-copo button{border-radius:999px;font-weight:800;box-shadow:3px 3px 0 #ff7aa8}
+.d-helados-copo button:active{transform:translate(2px,2px);box-shadow:1px 1px 0 #ff7aa8}
+.d-helados-copo button:disabled{box-shadow:none}
+.d-helados-copo .fila{border-bottom:2px dotted #f3c9da}
+.hc-fila{list-style:none;margin:.4rem 0 .8rem;padding:0;display:grid;grid-template-columns:repeat(4,1fr);gap:.2rem .4rem}
+.hc-fila li{color:#e7b3c8;display:flex;justify-content:center}
+.hc-fila li:nth-child(odd){transform:rotate(-5deg)}.hc-fila li:nth-child(even){transform:rotate(5deg) translateY(4px)}
+.hc-fila svg{width:100%;max-width:58px;aspect-ratio:40/58}
+.hc-fila .c0{color:#ff7aa8}.hc-fila .c1{color:#4fd1b0}.hc-fila .c2{color:#ffc53d}.hc-fila .c3{color:#a98bff}
+.hc-fila li.nueva svg{animation:hc-pop .6s cubic-bezier(.2,1.4,.4,1)}
+@keyframes hc-pop{0%{transform:scale(.2) translateY(-24px);opacity:0}100%{transform:none;opacity:1}}
+.hc-barra{height:14px;border-radius:99px;background:#fbdce8;border:2px solid var(--tinta);overflow:hidden}
+.hc-barra i{display:block;height:100%;background:repeating-linear-gradient(135deg,#ff7aa8 0 10px,#ffc53d 10px 20px,#4fd1b0 20px 30px);transition:width .6s}
+.hc-pie{margin:.7rem 0 0;font-size:.95rem}

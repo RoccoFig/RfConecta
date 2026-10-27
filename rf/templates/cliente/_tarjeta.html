@@ -1,0 +1,4 @@
+<section class="tarjeta" aria-labelledby="t-sellos"><h2 id="t-sellos">Tu tarjeta de sellos</h2>
+<div class="sellos" role="img" aria-label="{{ sellos }} de {{ tarjeta }} sellos">
+{% for i in range(tarjeta) %}<span class="sello {{ 'on' if i < sellos }}">{{ t.icono if i < sellos else i + 1 }}</span>{% endfor %}</div>
+<small>{{ sellos }} de {{ tarjeta }}. Al completarla ganás: {{ premio_tarjeta }}.</small></section>

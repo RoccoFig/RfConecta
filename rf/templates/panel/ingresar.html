@@ -1,0 +1,12 @@
+{% import "panel/_ui.html" as ui with context %}
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex">
+<title>{{ titulo }} · {{ encabezado }}</title><link rel="stylesheet" href="{{ url_for('static', filename='css/rf.css') }}">
+<body><main class="login"><div class="caja">
+{% if marca %}{{ avatar(marca.nombre, marca.tema, marca.slug, marca.tiene_logo, marca.logo_ver, 46) }}{% else %}<span class="logo-rf" style="width:46px;height:46px;font-size:19px">RF</span>{% endif %}
+<h1>{{ encabezado }}</h1><p class="sub">{{ texto }}</p>
+{% if error %}<div class="error-caja" role="alert">{{ error }}</div>{% endif %}
+<form method="post" autocomplete="off">{{ csrf_input() }}<input type="hidden" name="siguiente" value="{{ siguiente }}">
+<label class="campo"><span>Contraseña</span><input type="password" name="clave" required autofocus autocomplete="current-password"></label>
+<button class="btn acento" style="width:100%">Ingresar</button></form>
+{% if marca %}<p class="sub" style="margin-top:18px;font-size:12px">Con tecnología RF</p>{% endif %}
+</div></main></body></html>

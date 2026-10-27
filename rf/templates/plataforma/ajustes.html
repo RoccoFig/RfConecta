@@ -1,0 +1,7 @@
+{% extends "panel/layout.html" %}{% import "panel/_ui.html" as ui with context %}
+{% block cuerpo %}
+<div class="rejilla"><section class="panel c8"><div class="panel-h"><div><h2>Estado de la plataforma</h2><p class="sub">Cada punto se revisa en este momento, no es una lista fija.</p></div></div>
+<div class="panel-c"><div class="estado-lista">{% for t, ok, d in revisiones %}<div class="e"><div><b>{{ t }}</b><small>{{ d }}</small></div><span class="badge {{ 'ok' if ok else 'warn' }}">{{ 'Correcto' if ok else 'Revisar' }}</span></div>{% endfor %}</div></div></section>
+<aside class="panel c4"><div class="panel-h"><h2>En números</h2></div><div class="panel-c"><div class="estado-lista">
+<div class="e"><b>Negocios</b><span>{{ k.negocios }}</span></div><div class="e"><b>Clientes</b><span>{{ k.clientes }}</span></div><div class="e"><b>Entregas realizadas</b><span>{{ k.entregados }}</span></div></div></div></aside></div>
+{% endblock %}

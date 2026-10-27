@@ -1,0 +1,19 @@
+{% extends "panel/layout.html" %}{% import "panel/_ui.html" as ui with context %}
+{% block cuerpo %}
+<form class="toolbar" method="get" data-auto>
+  <div class="buscador">{{ ui.ico('search') }}<input type="search" name="q" value="{{ q }}" placeholder="Buscar por nombre o teléfono" aria-label="Buscar clientes"></div>
+  {% if lista_negocios %}<select name="negocio" aria-label="Negocio"><option value="">Todos los negocios</option>{% for n in lista_negocios %}<option value="{{ n.slug }}" {{ 'selected' if n.slug == slug }}>{{ n.nombre }}</option>{% endfor %}</select>{% endif %}
+  <select name="orden" aria-label="Ordenar por">{% for k, v in [('recientes', 'Más recientes'), ('puntos', 'Más puntos'), ('visitas', 'Más visitas'), ('nombre', 'Nombre')] %}<option value="{{ k }}" {{ 'selected' if k == orden }}>{{ v }}</option>{% endfor %}</select>
+  <button class="btn sec">Buscar</button>
+</form>
+<section class="panel"><div class="tabla-wrap">
+{% if r.filas %}<table class="tabla apilar"><thead><tr><th>Cliente</th>{% if lista_negocios %}<th>Negocio</th>{% endif %}<th class="num">Puntos</th><th class="num">Visitas</th><th>Última visita</th><th>Alta</th></tr></thead><tbody>
+{% for c in r.filas %}<tr>
+<td class="principal-c"><div class="nombre-cel"><div>{% if not lista_negocios %}<a class="fila-link" href="{{ ruta('cliente', cliente_id=c.id) }}"><b>{{ c.nombre }}</b></a>{% else %}<b>{{ c.nombre }}</b>{% endif %}<small>{{ c.telefono }}{% if c.acepta_whatsapp %} · acepta WhatsApp{% endif %}</small></div></div></td>
+{% if lista_negocios %}<td data-et="Negocio"><div class="nombre-cel">{{ avatar(c.negocio, c.tema, c.slug, c.tiene_logo, c.logo_ver, 26) }}<span>{{ c.negocio }}</span></div></td>{% endif %}
+<td class="num" data-et="Puntos">{{ c.puntos }}</td><td class="num" data-et="Visitas">{{ c.visitas }}</td><td data-et="Última visita">{{ hace(c.ultima) }}</td><td data-et="Alta">{{ fecha(c.creado, False) }}</td></tr>{% endfor %}
+</tbody></table>
+<div class="pie-tabla"><span>Página {{ r.pagina }} de {{ r.paginas }} · {{ r.total }} clientes</span>{{ ui.paginacion(r) }}</div>
+{% else %}{% call ui.vacio("Sin clientes", "Cuando alguien se registre desde un cartel, va a aparecer acá." if not q else "No encontramos clientes con esa búsqueda.", "users") %}{% endcall %}{% endif %}
+</div></section>
+{% endblock %}

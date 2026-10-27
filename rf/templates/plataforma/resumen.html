@@ -1,0 +1,28 @@
+{% extends "panel/layout.html" %}{% import "panel/_ui.html" as ui with context %}
+{% block acciones %}<a class="btn acento" href="{{ ruta('negocio_nuevo') }}">{{ ui.ico('plus') }}Nuevo negocio</a>{% endblock %}
+{% block cuerpo %}
+<div class="rejilla">
+  <div class="c3">{{ ui.kpi("Negocios activos", k.negocios_activos, "de " ~ k.negocios ~ " en total", "store") }}</div>
+  <div class="c3">{{ ui.kpi("Clientes", k.clientes, k.nuevos7 ~ " nuevos en 7 días", "users") }}</div>
+  <div class="c3">{{ ui.kpi("Visitas en 7 días", k.visitas7, "vs. los 7 días anteriores" if k.delta_visitas is not none else "Primera semana de datos", "scan-line", k.delta_visitas) }}</div>
+  <div class="c3">{{ ui.kpi("Canjes pendientes", k.pendientes, (k.pendientes_viejos ~ " con más de 2 días") if k.pendientes_viejos else "Todo al día", "gift") }}</div>
+</div>
+<div class="rejilla">
+  <section class="panel c8"><div class="panel-h"><div><h2>Visitas por día</h2><p class="sub">Últimos 30 días · {{ k.visitas30 }} en total</p></div></div>
+    <div class="panel-c">{{ grafico }}<div class="g-ejes"><span>{{ et[0] }}</span><span>{{ et[15] }}</span><span>{{ et[-1] }} · hoy</span></div></div></section>
+  <section class="panel c4"><div class="panel-h"><h2>Requieren atención</h2>{% if alertas %}<span class="badge warn">{{ alertas|length }}</span>{% endif %}</div>
+    <div class="panel-c">{% if alertas %}<ul class="alertas">{% for a in alertas[:6] %}<li class="{{ a.nivel }}">{{ ui.ico('triangle-alert') }}<div><b>{{ a.nombre }}</b><small>{{ a.texto }}</small></div>
+      <a href="{{ ruta('negocio', slug=a.slug, tab={'carteles': 'carteles', 'resumen': 'resumen'}.get(a.enlace, 'resumen')) if a.enlace != 'canjes' else ruta('canjes', negocio=a.slug) }}">Ver</a></li>{% endfor %}</ul>
+      {% else %}<p class="todo-ok">{{ ui.ico('circle-check') }}Todos los negocios funcionan con normalidad.</p>{% endif %}</div></section>
+</div>
+<div class="rejilla">
+  <section class="panel c7"><div class="panel-h"><h2>Actividad reciente</h2><a class="btn sec chico" href="{{ ruta('actividad') }}">Ver todo</a></div>
+    <div class="panel-c">{% if reciente %}{{ ui.actividad_lista(reciente, True) }}{% else %}{% call ui.vacio("Sin actividad todavía", "Cuando los clientes empiecen a usar los carteles, lo vas a ver acá en tiempo real.", "activity") %}{% endcall %}{% endif %}</div></section>
+  <section class="panel c5"><div class="panel-h"><div><h2>Negocios más activos</h2><p class="sub">Visitas en 30 días</p></div></div>
+    <div class="panel-c">{% if ranking %}<ol class="ranking">{% for n in ranking %}<li>{{ avatar(n.nombre, n.tema, n.slug, n.tiene_logo, n.logo_ver, 28) }}<a href="{{ ruta('negocio', slug=n.slug) }}"><b>{{ n.nombre }}</b></a><span>{{ n.visitas30 }}</span>
+      <div class="barra-r"><i style="width:{{ (100 * n.visitas30 / ranking[0].visitas30)|round|int }}%"></i></div></li>{% endfor %}</ol>
+      {% else %}<p class="sub" style="color:var(--muted)">Todavía no hay visitas en los últimos 30 días.</p>{% endif %}
+      <hr style="border:0;border-top:1px solid var(--line);margin:18px 0 14px"><div class="estado-lista" style="grid-template-columns:1fr 1fr">
+      <div class="e"><div><small>Puntos otorgados</small><b>{{ k.puntos30 }}</b></div></div><div class="e"><div><small>Puntos canjeados</small><b>{{ k.canjeados30 }}</b></div></div></div></div></section>
+</div>
+{% endblock %}

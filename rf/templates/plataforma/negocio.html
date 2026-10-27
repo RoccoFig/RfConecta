@@ -1,0 +1,79 @@
+{% extends "panel/layout.html" %}{% import "panel/_ui.html" as ui with context %}
+{% set base_url = 'https://' ~ (com.dominio or request.host) %}
+{% block acciones %}{{ ui.estado(com.estado) }}
+<a class="btn sec" href="{{ url_for('cliente.local', slug=com.slug) }}" target="_blank" rel="noopener">{{ ui.ico('external-link') }}Pantalla del cliente</a>
+<a class="btn" href="{{ url_for('negocio.resumen', slug=com.slug) }}">{{ ui.ico('eye') }}Abrir su panel</a>{% endblock %}
+{% block cuerpo %}
+<nav class="tabs" aria-label="Secciones del negocio">{% for k, v in [('resumen', 'Resumen'), ('configuracion', 'Configuración'), ('diseno', 'Diseño'), ('carteles', 'Carteles NFC')] %}<a href="{{ ruta('negocio', slug=com.slug, tab=k) }}" {% if tab == k %}aria-current="page"{% endif %}>{{ v }}</a>{% endfor %}</nav>
+
+{% if tab == 'resumen' %}
+<div class="rejilla">
+  <div class="c3">{{ ui.kpi("Clientes", k.clientes, k.nuevos7 ~ " nuevos en 7 días", "users") }}</div>
+  <div class="c3">{{ ui.kpi("Visitas en 7 días", k.visitas7, "vs. los 7 días anteriores" if k.delta_visitas is not none else "Primera semana de datos", "scan-line", k.delta_visitas) }}</div>
+  <div class="c3">{{ ui.kpi("Clientes que vuelven", (k.retorno ~ '%') if k.retorno is not none else '—', k.recurrentes ~ " de " ~ k.con_visita ~ " con 2 o más visitas", "trending-up") }}</div>
+  <div class="c3">{{ ui.kpi("Canjes pendientes", k.pendientes, k.entregados ~ " entregados en total", "gift") }}</div>
+</div>
+<div class="rejilla">
+  <section class="panel c8"><div class="panel-h"><div><h2>Visitas por día</h2><p class="sub">Últimos 30 días · {{ k.visitas30 }} en total</p></div></div>
+    <div class="panel-c">{{ grafico }}<div class="g-ejes"><span>{{ et[0] }}</span><span>{{ et[15] }}</span><span>{{ et[-1] }} · hoy</span></div></div></section>
+  <section class="panel c4"><div class="panel-h"><h2>Premios más pedidos</h2></div><div class="panel-c">
+    {% if populares %}<ol class="ranking">{% for p in populares %}<li><span></span><b>{{ p.nombre }}</b><span>{{ p.n }}</span><div class="barra-r"><i style="width:{{ (100 * p.n / populares[0].n)|round|int }}%"></i></div></li>{% endfor %}</ol>
+    {% else %}<p style="color:var(--muted)">Todavía nadie canjeó premios.</p>{% endif %}</div></section>
+</div>
+
+{% elif tab == 'configuracion' %}
+<div class="rejilla"><section class="panel c7"><div class="panel-h"><h2>Datos del negocio</h2></div><div class="panel-c">
+<form method="post" action="{{ ruta('negocio_datos', slug=com.slug) }}">{{ csrf_input() }}<div class="form-g">
+<label class="campo ancho"><span>Nombre</span><input name="nombre" value="{{ com.nombre }}" required maxlength="60"></label>
+<label class="campo"><span>Rubro</span><select name="categoria">{% for r in rubros %}<option {{ 'selected' if com.categoria == r }}>{{ r }}</option>{% endfor %}{% if com.categoria and com.categoria not in rubros %}<option selected>{{ com.categoria }}</option>{% endif %}</select></label>
+<label class="campo"><span>Dominio propio</span><input name="dominio" value="{{ com.dominio or '' }}" placeholder="micafe.com" autocomplete="off"></label>
+<label class="campo ancho"><span>Frase corta</span><input name="tagline" value="{{ com.tagline or '' }}" maxlength="80"></label></div>
+<button class="btn">Guardar cambios</button></form></div></section>
+<div class="c5" style="display:flex;flex-direction:column;gap:16px">
+<section class="panel"><div class="panel-h"><h2>Estado del programa</h2></div><div class="panel-c">
+<p style="margin-bottom:12px;color:var(--muted)">{% if com.estado == 'activo' %}Los clientes pueden sumar sellos y canjear premios.{% else %}Pausado: los clientes ven un aviso y nada suma. Sus datos se conservan.{% endif %}</p>
+<form method="post" action="{{ ruta('negocio_estado', slug=com.slug) }}" {% if com.estado == 'activo' %}data-confirmar="Los clientes de {{ com.nombre }} no podrán sumar ni canjear hasta que lo reactives." data-boton="Suspender"{% endif %}>{{ csrf_input() }}
+<button class="btn {{ 'peligro' if com.estado == 'activo' else 'acento' }}">{{ ui.ico('power') }}{{ 'Suspender programa' if com.estado == 'activo' else 'Reactivar programa' }}</button></form></div></section>
+<section class="panel"><div class="panel-h"><h2>Acceso del dueño</h2></div><div class="panel-c">
+<p style="margin-bottom:12px;color:var(--muted)">{{ 'Tiene una clave configurada.' if com.clave_hash else 'Todavía no tiene clave: no puede entrar a su panel.' }}</p>
+<button class="btn sec" data-abrir="dlg-clave">{{ ui.ico('key-round') }}Definir una clave nueva</button></div></section></div></div>
+{% call ui.dialogo("dlg-clave", "Nueva clave del dueño", "Guardar clave", ruta('negocio_clave', slug=com.slug)) %}
+<label class="campo"><span>Clave nueva <small>(mínimo 8 caracteres)</small></span><input type="password" name="clave" required minlength="8" autocomplete="new-password"></label>{% endcall %}
+
+{% elif tab == 'diseno' %}
+<div class="rejilla"><div class="c7" style="display:flex;flex-direction:column;gap:16px">
+<section class="panel"><div class="panel-h"><div><h2>Diseño a medida</h2><p class="sub">La pantalla que ve el cliente se programa para cada negocio.</p></div>{% if diseno.a_medida %}<span class="badge ok">A medida</span>{% else %}<span class="badge">Tema base</span>{% endif %}</div>
+<div class="panel-c">
+{% if diseno.a_medida %}<p style="margin-bottom:10px">Este negocio tiene su propio diseño. Archivos que lo componen:</p>
+<div class="caja-codigo">{% for f in diseno.plantillas %}rf/templates/disenos/{{ com.slug }}/{{ f }}<br>{% endfor %}{% for f in diseno.archivos %}rf/static/disenos/{{ com.slug }}/{{ f }}<br>{% endfor %}</div>
+<p style="margin-top:12px;color:var(--muted)">Cualquier plantilla que falte (registro, home, entrar…) usa la versión base. Editá estos archivos en tu compu y subí los cambios a GitHub.</p>
+{% else %}<p style="margin-bottom:10px">Todavía no tiene diseño propio: se muestra con el tema base de abajo. Para crearle uno, ejecutá en tu compu:</p>
+<div class="caja-codigo">python tools/nuevo_diseno.py {{ com.slug }}</div>
+<p style="margin-top:12px;color:var(--muted)">Eso crea la carpeta con una tarjeta de lealtad y un estilo de partida. Después los editás a gusto y los subís a GitHub.</p>{% endif %}</div></section>
+<section class="panel"><div class="panel-h"><div><h2>Tema base (respaldo)</h2><p class="sub">Se usa mientras no haya diseño propio y para los colores del panel del negocio.</p></div></div>
+<div class="panel-c"><form method="post" action="{{ ruta('negocio_tema', slug=com.slug) }}" enctype="multipart/form-data">{{ csrf_input() }}<div class="form-g">
+<label class="campo"><span>Fondo</span><input type="color" name="fondo" value="{{ v.fondo }}"></label><label class="campo"><span>Texto</span><input type="color" name="tinta" value="{{ v.tinta }}"></label>
+<label class="campo"><span>Color destacado</span><input type="color" name="acento" value="{{ v.acento }}"></label>
+<label class="campo"><span>Ícono del sello</span><input name="icono" value="{{ v.icono }}" maxlength="8"></label>
+<label class="campo"><span>Esquinas</span><select name="forma">{% for k, px in formas.items() %}<option value="{{ k }}" {{ 'selected' if v.forma == k }}>{{ {'recta': 'Rectas', 'suave': 'Suaves', 'redonda': 'Muy redondeadas'}[k] }}</option>{% endfor %}</select></label>
+<label class="campo"><span>Tipografía</span><select name="tipografia">{% for k in tipografias %}<option value="{{ k }}" {{ 'selected' if v.tipografia == k }}>{{ {'clasica': 'Clásica', 'moderna': 'Moderna', 'redondeada': 'Redondeada'}[k] }}</option>{% endfor %}</select></label>
+<label class="campo ancho"><span>Logo <small>(PNG, JPG o WebP, hasta 400 KB)</small></span><input type="file" name="logo" accept="image/png,image/jpeg,image/webp"></label></div>
+<button class="btn">Guardar tema base</button></form></div></section></div>
+<section class="panel c5"><div class="panel-h"><div><h2>Así lo ve el cliente</h2><p class="sub">Vista en vivo</p></div><a class="btn sec chico" href="{{ url_for('cliente.local', slug=com.slug) }}" target="_blank" rel="noopener">{{ ui.ico('external-link') }}Abrir</a></div>
+<div class="panel-c" style="display:grid;place-items:center"><div class="telefono"><iframe src="{{ url_for('cliente.local', slug=com.slug) }}" title="Vista previa de {{ com.nombre }}" loading="lazy"></iframe></div></div></section></div>
+
+{% elif tab == 'carteles' %}
+<div class="rejilla"><section class="panel c7"><div class="panel-h"><h2>Carteles de este negocio</h2></div><div class="panel-c sin"><div class="tabla-wrap">
+{% if tags %}<table class="tabla apilar"><thead><tr><th>UID</th><th>Estado</th><th class="num">Lecturas</th><th>Último escaneo</th><th></th></tr></thead><tbody>
+{% for t in tags %}<tr><td class="principal-c mono"><b>{{ t.uid }}</b></td><td data-et="Estado"><span class="badge {{ 'ok' if t.activo }}">{{ 'Activo' if t.activo else 'Desactivado' }}</span></td>
+<td class="num" data-et="Lecturas">{{ t.ultimo_contador + 1 if t.ultimo_contador >= 0 else 0 }}</td><td data-et="Último escaneo">{{ hace(t.ultimo_escaneo) if t.ultimo_escaneo else 'Nunca' }}</td>
+<td class="acc"><form method="post" action="{{ ruta('carteles_estado', tag_id=t.id) }}">{{ csrf_input() }}<button class="btn sec chico">{{ ui.ico('power') }}{{ 'Desactivar' if t.activo else 'Activar' }}</button></form></td></tr>{% endfor %}</tbody></table>
+{% else %}{% call ui.vacio("Sin carteles", "Registrá el UID de cada cartel NFC para que pueda sumar sellos.", "nfc") %}{% endcall %}{% endif %}</div></div></section>
+<div class="c5" style="display:flex;flex-direction:column;gap:16px">
+<section class="panel"><div class="panel-h"><h2>Registrar un cartel</h2></div><div class="panel-c"><form method="post" action="{{ ruta('carteles') }}">{{ csrf_input() }}<input type="hidden" name="negocio" value="{{ com.slug }}">
+<label class="campo"><span>UID <small>(14 caracteres)</small></span><input name="uid" class="mono" required minlength="14" maxlength="23" autocomplete="off" placeholder="04DE5F1EACC040"></label><button class="btn">Registrar</button></form></div></section>
+<section class="panel"><div class="panel-h"><h2>Link para programar el cartel</h2></div><div class="panel-c"><p style="color:var(--muted);margin-bottom:10px">Es el mismo formato para todos los carteles de este negocio.</p>
+<div class="caja-codigo" style="word-break:break-all">{{ base_url }}/t?picc_data=00000000000000000000000000000000&amp;cmac=0000000000000000</div>
+<button class="btn sec chico" style="margin-top:10px" data-copiar="{{ base_url }}/t?picc_data=00000000000000000000000000000000&cmac=0000000000000000">{{ ui.ico('copy') }}Copiar link</button></div></section></div></div>
+{% endif %}
+{% endblock %}

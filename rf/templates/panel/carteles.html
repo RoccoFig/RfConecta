@@ -1,0 +1,18 @@
+{% extends "panel/layout.html" %}{% import "panel/_ui.html" as ui with context %}
+{% block acciones %}<button class="btn acento" data-abrir="dlg-cartel">{{ ui.ico('plus') }}Registrar un cartel</button>{% endblock %}
+{% block cuerpo %}
+<section class="panel"><div class="tabla-wrap">
+{% if tags %}<table class="tabla apilar"><thead><tr><th>UID del cartel</th>{% if global_ %}<th>Negocio</th>{% endif %}<th>Estado</th><th class="num">Lecturas</th><th>Último escaneo</th><th></th></tr></thead><tbody>
+{% for t in tags %}<tr><td class="principal-c mono"><b>{{ t.uid }}</b></td>
+{% if global_ %}<td data-et="Negocio"><div class="nombre-cel">{{ avatar(t.negocio, t.tema, t.slug, t.tiene_logo, t.logo_ver, 26) }}<span>{{ t.negocio }}</span></div></td>{% endif %}
+<td data-et="Estado"><span class="badge {{ 'ok' if t.activo else '' }}">{{ 'Activo' if t.activo else 'Desactivado' }}</span></td>
+<td class="num" data-et="Lecturas">{{ t.ultimo_contador + 1 if t.ultimo_contador >= 0 else 0 }}</td><td data-et="Último escaneo">{{ hace(t.ultimo_escaneo) if t.ultimo_escaneo else 'Nunca' }}</td>
+<td class="acc"><form method="post" action="{{ ruta('carteles_estado', tag_id=t.id) }}" {% if t.activo %}data-confirmar="El cartel dejará de sumar sellos hasta que lo reactives." data-boton="Desactivar"{% endif %}>{{ csrf_input() }}<button class="btn sec chico">{{ ui.ico('power') }}{{ 'Desactivar' if t.activo else 'Activar' }}</button></form></td></tr>{% endfor %}
+</tbody></table>
+{% else %}{% call ui.vacio("Todavía no hay carteles", "Registrá el UID de cada cartel NFC (14 caracteres) para que pueda sumar sellos a los clientes.", "nfc") %}<button class="btn acento" data-abrir="dlg-cartel">Registrar el primero</button>{% endcall %}{% endif %}
+</div></section>
+{% call ui.dialogo("dlg-cartel", "Registrar un cartel", "Registrar") %}
+{% if global_ %}<label class="campo"><span>Negocio</span><select name="negocio" required>{% for n in lista_negocios %}<option value="{{ n.slug }}">{{ n.nombre }}</option>{% endfor %}</select></label>{% endif %}
+<label class="campo"><span>UID del cartel <small>(14 caracteres; lo muestra la app NXP TagInfo o aparece en los registros al primer escaneo)</small></span><input name="uid" class="mono" required minlength="14" maxlength="23" autocomplete="off" placeholder="04DE5F1EACC040"></label>
+{% endcall %}
+{% endblock %}

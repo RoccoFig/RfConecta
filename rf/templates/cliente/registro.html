@@ -1,0 +1,14 @@
+{% extends "cliente/base.html" %}
+{% block cuerpo %}
+<h1>Creá tu cuenta</h1>
+<p>Registrate una vez y sumá puntos y sellos en cada visita.</p>
+{% if error %}<p class="aviso" role="alert">{{ error }}</p>{% endif %}
+<form method="post" action="{{ url_for('cliente.registro', slug=com.slug) }}">{{ csrf_input() }}
+<label>Nombre<input name="nombre" required autocomplete="name" maxlength="80"></label>
+<label>Teléfono (con código de área)<input name="telefono" type="tel" inputmode="tel" required autocomplete="tel"></label>
+<label>Email (opcional)<input name="email" type="email" autocomplete="email"></label>
+<label class="chk"><input type="checkbox" name="acepta" value="1">
+<span>Acepto recibir cupones e invitaciones por WhatsApp. Puedo darme de baja cuando quiera.</span></label>
+<button>Crear mi cuenta</button></form>
+<p><a href="{{ url_for('cliente.entrar', slug=com.slug) }}">Ya tengo cuenta</a></p>
+{% endblock %}

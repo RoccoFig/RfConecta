@@ -1,0 +1,8 @@
+{% extends "cliente/base.html" %}
+{% block cuerpo %}
+<h1>Ingresá tu código</h1><p>Si el número está registrado, te llegó un código de 6 dígitos por WhatsApp.</p>
+{% if error %}<p class="aviso" role="alert">{{ error }}</p>{% endif %}
+<form method="post">{{ csrf_input() }}<input type="hidden" name="tel" value="{{ tel }}">
+<label>Código<input name="codigo" inputmode="numeric" maxlength="6" required autocomplete="one-time-code"></label>
+<button>Entrar</button></form>
+{% endblock %}

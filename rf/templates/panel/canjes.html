@@ -1,0 +1,23 @@
+{% extends "panel/layout.html" %}{% import "panel/_ui.html" as ui with context %}
+{% block acciones %}{% if puede_validar %}<button class="btn acento" data-abrir="dlg-validar">{{ ui.ico('ticket') }}Validar un código</button>{% endif %}{% endblock %}
+{% block cuerpo %}
+<nav class="tabs" aria-label="Estado del canje">{% for k, v in [('', 'Todos'), ('pendiente', 'Pendientes'), ('usado', 'Entregados')] %}<a href="{{ url_for(request.endpoint, **dict(request.view_args, estado=k, negocio=slug or None, q=q or None)) }}" {% if k == estado %}aria-current="page"{% endif %}>{{ v }}</a>{% endfor %}</nav>
+<form class="toolbar" method="get" data-auto><input type="hidden" name="estado" value="{{ estado }}">
+  <div class="buscador">{{ ui.ico('search') }}<input type="search" name="q" value="{{ q }}" placeholder="Buscar por código o cliente" aria-label="Buscar canjes"></div>
+  {% if lista_negocios %}<select name="negocio" aria-label="Negocio"><option value="">Todos los negocios</option>{% for n in lista_negocios %}<option value="{{ n.slug }}" {{ 'selected' if n.slug == slug }}>{{ n.nombre }}</option>{% endfor %}</select>{% endif %}
+  <button class="btn sec">Buscar</button></form>
+<section class="panel"><div class="tabla-wrap">
+{% if r.filas %}<table class="tabla apilar"><thead><tr><th>Código</th><th>Premio</th><th>Cliente</th>{% if lista_negocios %}<th>Negocio</th>{% endif %}<th>Estado</th><th>Pedido</th>{% if puede_validar %}<th></th>{% endif %}</tr></thead><tbody>
+{% for k in r.filas %}<tr>
+<td class="principal-c mono"><b>{{ k.codigo }}</b></td><td data-et="Premio">{{ k.premio }}</td><td data-et="Cliente">{{ k.cliente }}</td>
+{% if lista_negocios %}<td data-et="Negocio">{{ k.negocio }}</td>{% endif %}
+<td data-et="Estado">{{ ui.estado(k.estado) }}</td><td data-et="Pedido" title="{{ fecha(k.creado) }}">{{ hace(k.creado) }}</td>
+{% if puede_validar %}<td class="acc">{% if k.estado == 'pendiente' %}<form method="post" action="{{ ruta('canje_validar') }}" data-confirmar="¿Entregaste «{{ k.premio }}» a {{ k.cliente }}?" data-boton="Sí, entregado">{{ csrf_input() }}<input type="hidden" name="codigo" value="{{ k.codigo }}"><button class="btn chico">{{ ui.ico('check') }}Entregar</button></form>{% endif %}</td>{% endif %}</tr>{% endfor %}
+</tbody></table><div class="pie-tabla"><span>Página {{ r.pagina }} de {{ r.paginas }} · {{ r.total }} canjes</span>{{ ui.paginacion(r) }}</div>
+{% else %}{% call ui.vacio("Sin canjes", "Cuando un cliente canjee un premio o complete su tarjeta, aparece acá con su código.", "gift") %}{% endcall %}{% endif %}
+</div></section>
+{% if puede_validar %}{% call ui.dialogo("dlg-validar", "Validar un código", "Entregar premio", ruta("canje_validar")) %}
+<p style="margin-bottom:12px;color:var(--muted)">Pedile el código al cliente y escribilo para marcar el premio como entregado.</p>
+<label class="campo"><span>Código del cliente</span><input name="codigo" class="mono" required maxlength="12" autocomplete="off" placeholder="A1B2C3"></label>
+{% endcall %}{% endif %}
+{% endblock %}

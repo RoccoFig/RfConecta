@@ -1,0 +1,17 @@
+{% extends "panel/layout.html" %}{% import "panel/_ui.html" as ui with context %}
+{% block acciones %}<button class="btn acento" data-abrir="dlg-nuevo">{{ ui.ico('plus') }}Nuevo premio</button>{% endblock %}
+{% block cuerpo %}
+<section class="panel"><div class="tabla-wrap">
+{% if premios %}<table class="tabla apilar"><thead><tr><th>Premio</th><th class="num">Puntos necesarios</th><th class="num">Veces canjeado</th><th></th></tr></thead><tbody>
+{% for p in premios %}<tr><td class="principal-c"><b>{{ p.nombre }}</b></td><td class="num" data-et="Puntos">{{ p.costo }}</td><td class="num" data-et="Canjeado">{{ p.canjeados }}</td>
+<td class="acc"><button class="btn sec chico" data-abrir="dlg-editar" data-accion="{{ ruta('premio_editar', premio_id=p.id) }}" data-valores='{{ {"nombre": p.nombre, "costo": p.costo}|tojson }}'>{{ ui.ico('pencil') }}Editar</button>
+<form method="post" action="{{ ruta('premio_quitar', premio_id=p.id) }}" style="display:inline" data-confirmar="Dejará de aparecerle a tus clientes. Los canjes ya generados siguen siendo válidos." data-boton="Quitar">{{ csrf_input() }}<button class="btn peligro chico">{{ ui.ico('x') }}Quitar</button></form></td></tr>{% endfor %}</tbody></table>
+{% else %}{% call ui.vacio("Todavía no hay premios", "Sin premios, tus clientes suman puntos pero no tienen qué canjear. Empezá con uno simple.", "gift") %}<button class="btn acento" data-abrir="dlg-nuevo">Crear el primero</button>{% endcall %}{% endif %}
+</div></section>
+{% call ui.dialogo("dlg-nuevo", "Nuevo premio", "Agregar", ruta('premio_crear')) %}
+<label class="campo"><span>Nombre del premio</span><input name="nombre" required maxlength="60" placeholder="Café gratis"></label>
+<label class="campo"><span>Puntos necesarios</span><input name="costo" type="number" min="1" max="100000" required placeholder="50"></label>{% endcall %}
+{% call ui.dialogo("dlg-editar", "Editar premio", "Guardar cambios") %}
+<label class="campo"><span>Nombre del premio</span><input name="nombre" required maxlength="60"></label>
+<label class="campo"><span>Puntos necesarios</span><input name="costo" type="number" min="1" max="100000" required></label>{% endcall %}
+{% endblock %}

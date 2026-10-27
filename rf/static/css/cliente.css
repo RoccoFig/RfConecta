@@ -1,0 +1,26 @@
+/* Estructura común de la pantalla del cliente. Los colores y formas llegan como variables desde cada negocio. */
+*{box-sizing:border-box}
+body{margin:0;font:16px/1.5 var(--fuente);background:var(--fondo);color:var(--tinta);-webkit-text-size-adjust:100%}
+.marca{display:flex;align-items:center;gap:.85rem;padding:.9rem 1.25rem;padding-top:max(.9rem,env(safe-area-inset-top));background:var(--tinta);color:var(--fondo)}
+.marca strong{display:block;font:700 1.3rem/1.15 var(--titulo)}.marca small{opacity:.85}
+main{max-width:30rem;margin:0 auto;padding:1.25rem 1.25rem max(3rem,env(safe-area-inset-bottom))}
+h1{font:700 1.7rem/1.2 var(--titulo);margin:.2rem 0 1rem}h2{font:700 1.15rem/1.3 var(--titulo);margin:1.8rem 0 .6rem}
+a{color:var(--tinta)}.pista{opacity:.75;font-size:.92rem}
+.puntos{font:800 3.4rem/1 var(--titulo)}
+.tarjeta{background:var(--sup);border:1px solid var(--linea);border-radius:var(--radio);padding:1rem 1.1rem;margin:0 0 1rem}
+.tarjeta h2{margin-top:0}
+label{display:block;font-size:.92rem}
+input,button{font:inherit;width:100%;padding:.8rem;min-height:2.9rem;border:1px solid var(--linea);border-radius:var(--radio);margin:.25rem 0 .75rem;background:var(--sup);color:var(--tinta)}
+button{background:var(--tinta);color:#fff;border:0;font-weight:600;cursor:pointer}
+button.sec{background:var(--sup);color:var(--tinta);border:1px solid var(--linea)}
+button:disabled{background:var(--linea);color:#6b6b6b;cursor:not-allowed}
+button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid var(--acento);outline-offset:2px}
+.fila{display:flex;justify-content:space-between;gap:1rem;align-items:center;padding:.6rem 0;border-bottom:1px solid var(--linea)}
+.fila form{width:8rem}.fila button{margin:0}
+.aviso{background:var(--sup);border-left:4px solid var(--acento);border-radius:var(--radio);padding:.6rem .8rem;margin:0 0 1rem}
+.codigo{font:700 1.4rem ui-monospace,monospace;letter-spacing:.1em}
+.chk{display:flex;gap:.6rem;align-items:flex-start;font-size:.9rem}.chk input{width:auto;min-height:0;margin-top:.3rem}
+.sellos{display:grid;grid-template-columns:repeat(4,1fr);gap:.6rem;margin:.6rem 0}
+.sello{aspect-ratio:1;border:2px dashed var(--linea);border-radius:50%;display:grid;place-items:center;font-weight:800;color:#8a8a8a;font-size:1.3rem}
+.sello.on{background:var(--acento);border:2px solid var(--tinta);color:var(--tinta)}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}

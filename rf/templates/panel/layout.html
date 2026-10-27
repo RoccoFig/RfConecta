@@ -1,0 +1,36 @@
+{% import "panel/_ui.html" as ui with context %}
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex">
+<title>{{ titulo }} · {{ marca_nombre }}</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/rf.css') }}">
+{% if ambito == 'negocio' %}<style>:root{--marca:{{ marca_tema.acento }};--marca-ink:{{ marca_tema.tinta }}}</style>{% endif %}
+{% block cabeza %}{% endblock %}</head>
+<body data-ambito="{{ ambito }}">
+<a class="solo-lector" href="#contenido">Saltar al contenido</a>
+{% if soporte and ambito == 'negocio' %}<div class="banner-soporte">{{ ui.ico('shield-check') }}Estás viendo el panel de {{ marca_nombre }} como RF. <a href="{{ url_for('plataforma.negocio', slug=com.slug) }}"><b>Volver a la plataforma</b></a></div>{% endif %}
+<div class="app">
+<aside class="lateral" aria-label="Navegación principal">
+  <a class="marca-rf" href="{{ inicio_url }}">
+    {% if ambito == 'negocio' %}{{ avatar(com.nombre, com.tema, com.slug, com.tiene_logo, com.logo_ver, 38) }}<span><b>{{ marca_nombre }}</b><small>Programa de lealtad</small></span>
+    {% else %}<span class="logo-rf">RF</span><span><b>RF Conecta</b><small>Plataforma</small></span>{% endif %}
+  </a>
+  <nav class="nav" aria-label="Secciones">{% for g in nav %}{% if g.titulo %}<div class="nav-t">{{ g.titulo }}</div>{% endif %}
+    {% for it in g['items'] %}<a href="{{ it.url }}" {% if it.activo %}aria-current="page"{% endif %}>{{ ui.ico(it.icono) }}<span>{{ it.etiqueta }}</span>{% if it.badge %}<span class="n">{{ it.badge }}</span>{% endif %}</a>{% endfor %}{% endfor %}</nav>
+  <div class="lateral-pie">
+    {% if ambito == 'negocio' %}<a href="{{ url_for('cliente.local', slug=com.slug) }}" target="_blank" rel="noopener">{{ ui.ico('external-link') }}Ver pantalla del cliente</a>{% endif %}
+    <form method="post" action="{{ salir_url }}">{{ csrf_input() }}<button>{{ ui.ico('log-out') }}Cerrar sesión</button></form>
+    {% if ambito == 'negocio' %}<p class="por-rf">Con tecnología RF</p>{% endif %}
+  </div>
+</aside>
+<div class="principal">
+  <header class="barra"><button class="icono-btn menu-btn" data-menu aria-label="Abrir el menú">{{ ui.ico('menu') }}</button>
+    <span class="migas">{{ marca_nombre }} <span aria-hidden="true">/</span> {{ titulo }}</span><span class="espacio"></span>{% block barra %}{% endblock %}</header>
+  <main class="contenido" id="contenido">
+    <div class="cabecera-pagina"><div><h1>{{ titulo }}</h1>{% if subtitulo %}<p class="sub">{{ subtitulo }}</p>{% endif %}</div><div class="acciones">{% block acciones %}{% endblock %}</div></div>
+    {% block cuerpo %}{% endblock %}
+  </main>
+</div></div>
+<dialog id="confirmar" aria-labelledby="confirmar-t"><div class="dlg-h"><h2 id="confirmar-t">¿Confirmás?</h2></div><div class="dlg-c" id="confirmar-texto"></div>
+<div class="dlg-p"><button type="button" class="btn sec" data-cerrar>Cancelar</button><button type="button" class="btn peligro" id="confirmar-si">Confirmar</button></div></dialog>
+<div class="toasts" aria-live="polite">{% for cat, msg in get_flashed_messages(with_categories=true) %}<div class="toast {{ cat }}" role="{{ 'alert' if cat == 'error' else 'status' }}">{{ ui.ico('circle-check' if cat == 'ok' else 'circle-alert') }}<span>{{ msg }}</span></div>{% endfor %}</div>
+<script src="{{ url_for('static', filename='js/rf.js') }}" defer></script>
+</body></html>

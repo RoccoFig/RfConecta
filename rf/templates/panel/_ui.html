@@ -1,0 +1,38 @@
+{# Componentes reutilizables de los paneles #}
+{% macro ico(n) -%}<svg class="i" aria-hidden="true" focusable="false"><use href="{{ url_for('static', filename='icons.svg') }}#{{ n }}"/></svg>{%- endmacro %}
+
+{% macro kpi(et, valor, nota=None, icono=None, delta=None) -%}
+<div class="panel kpi"><div class="et">{% if icono %}{{ ico(icono) }}{% endif %}{{ et }}</div><div class="v">{{ valor }}</div>
+<div class="nota">{% if delta is not none %}<span class="delta {{ 'sube' if delta >= 0 else 'baja' }}">{{ '+' if delta >= 0 }}{{ delta }}%</span>{% endif %}{% if nota %}<span>{{ nota }}</span>{% endif %}</div></div>
+{%- endmacro %}
+
+{% macro estado(e) -%}
+{%- set m = {'activo': ['ok', 'Activo'], 'suspendido': ['bad', 'Suspendido'], 'pendiente': ['warn', 'Pendiente'], 'usado': ['ok', 'Entregado']} -%}
+{%- set x = m.get(e, ['', e]) -%}<span class="badge {{ x[0] }}">{{ x[1] }}</span>
+{%- endmacro %}
+
+{% macro vacio(titulo, texto, icono='info') -%}
+<div class="vacio">{{ ico(icono) }}<h3>{{ titulo }}</h3><p>{{ texto }}</p>{% if caller %}{{ caller() }}{% endif %}</div>
+{%- endmacro %}
+
+{% macro paginacion(r) -%}
+{% if r.paginas > 1 %}<div class="pag">
+{% if r.pagina > 1 %}<a class="btn sec chico" href="{{ pagina_url(r.pagina - 1) }}">{{ ico('chevron-left') }}Anterior</a>{% endif %}
+{% if r.pagina < r.paginas %}<a class="btn sec chico" href="{{ pagina_url(r.pagina + 1) }}">Siguiente{{ ico('chevron-right') }}</a>{% endif %}</div>{% endif %}
+{%- endmacro %}
+
+{% macro actividad_lista(filas, con_negocio=False) -%}
+<ul class="feed">{% for a in filas %}
+<li><span class="pt {{ a.tipo }}">{{ ico({'visita': 'scan-line', 'canje': 'gift', 'registro': 'user-round'}[a.tipo]) }}</span>
+<div><b>{{ a.cliente }}</b> {{ {'visita': 'sumó una visita', 'canje': 'canjeó un premio', 'registro': 'se registró'}[a.tipo] }}
+<small>{% if con_negocio %}{{ a.negocio }}{% if a.tipo != 'registro' %} · {% endif %}{% endif %}{{ a.detalle if a.tipo != 'registro' }}</small></div>
+<span class="cuando" title="{{ fecha(a.t) }}">{{ hace(a.t) }}</span></li>
+{% else %}<li><span class="solo-lector">Sin actividad</span></li>{% endfor %}</ul>
+{%- endmacro %}
+
+{% macro dialogo(id, titulo, boton="Guardar", accion="") -%}
+<dialog id="{{ id }}" aria-labelledby="{{ id }}-t"><form method="post"{% if accion %} action="{{ accion }}"{% endif %}>{{ csrf_input() }}
+<div class="dlg-h"><h2 id="{{ id }}-t">{{ titulo }}</h2><button type="button" class="icono-btn" data-cerrar aria-label="Cerrar">{{ ico('x') }}</button></div>
+<div class="dlg-c">{{ caller() }}</div>
+<div class="dlg-p"><button type="button" class="btn sec" data-cerrar>Cancelar</button><button class="btn acento">{{ boton }}</button></div></form></dialog>
+{%- endmacro %}

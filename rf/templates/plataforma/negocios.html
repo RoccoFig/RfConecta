@@ -1,0 +1,21 @@
+{% extends "panel/layout.html" %}{% import "panel/_ui.html" as ui with context %}
+{% block acciones %}<a class="btn acento" href="{{ ruta('negocio_nuevo') }}">{{ ui.ico('plus') }}Nuevo negocio</a>{% endblock %}
+{% block cuerpo %}
+<div class="toolbar">
+  <div class="buscador">{{ ui.ico('search') }}<input type="search" data-filtrar="#tabla-negocios" placeholder="Buscar un negocio" aria-label="Buscar un negocio"></div>
+  <select data-filtrar="#tabla-negocios" data-col="estado" aria-label="Estado"><option value="">Todos los estados</option><option value="activo">Activos</option><option value="suspendido">Suspendidos</option></select>
+  <select data-filtrar="#tabla-negocios" data-col="rubro" aria-label="Rubro"><option value="">Todos los rubros</option>{% for r in rubros %}<option value="{{ r }}">{{ r }}</option>{% endfor %}</select>
+</div>
+<section class="panel"><div class="tabla-wrap"><table class="tabla apilar" id="tabla-negocios"><thead><tr><th>Negocio</th><th>Rubro</th><th>Estado</th><th class="num">Clientes</th><th class="num">Visitas 30 d</th><th>Última visita</th><th>Diseño</th><th></th></tr></thead><tbody>
+{% for n in negocios %}<tr data-estado="{{ n.estado }}" data-rubro="{{ n.categoria or '' }}">
+<td class="principal-c"><a class="fila-link nombre-cel" href="{{ ruta('negocio', slug=n.slug) }}">{{ avatar(n.nombre, n.tema, n.slug, n.tiene_logo, n.logo_ver, 38) }}<span><b>{{ n.nombre }}</b><small>/l/{{ n.slug }}{% if n.dominio %} · {{ n.dominio }}{% endif %}</small></span></a></td>
+<td data-et="Rubro">{{ n.categoria or '—' }}</td><td data-et="Estado">{{ ui.estado(n.estado) }}</td>
+<td class="num" data-et="Clientes">{{ n.nclientes }}</td><td class="num" data-et="Visitas 30 d">{{ n.visitas30 }}</td><td data-et="Última visita">{{ hace(n.ultima) if n.ultima else 'Sin visitas' }}</td>
+<td data-et="Diseño">{% if a_medida[n.slug] %}<span class="badge ok">A medida</span>{% else %}<span class="badge">Base</span>{% endif %}</td>
+<td class="acc"><a class="btn sec chico" href="{{ url_for('cliente.local', slug=n.slug) }}" target="_blank" rel="noopener" title="Abrir la pantalla del cliente" aria-label="Abrir la pantalla del cliente de {{ n.nombre }}">{{ ui.ico('external-link') }}</a>
+<a class="btn sec chico" href="{{ url_for('negocio.resumen', slug=n.slug) }}" title="Entrar al panel del negocio" aria-label="Entrar al panel de {{ n.nombre }}">{{ ui.ico('eye') }}</a>
+<a class="btn chico" href="{{ ruta('negocio', slug=n.slug) }}">Gestionar</a></td></tr>{% endfor %}
+</tbody></table>
+<div id="sin-resultados" class="oculto">{% call ui.vacio("Sin resultados", "Probá con otra búsqueda o quitá algún filtro.", "search") %}{% endcall %}</div>
+</div></section>
+{% endblock %}

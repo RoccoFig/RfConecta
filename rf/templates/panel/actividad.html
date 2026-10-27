@@ -1,0 +1,12 @@
+{% extends "panel/layout.html" %}{% import "panel/_ui.html" as ui with context %}
+{% block cuerpo %}
+<form class="toolbar" method="get" data-auto>
+  <div class="buscador">{{ ui.ico('search') }}<input type="search" name="q" value="{{ q }}" placeholder="Buscar por cliente" aria-label="Buscar por cliente"></div>
+  <select name="tipo" aria-label="Tipo de actividad"><option value="">Todo</option>{% for k, v in [('visita', 'Visitas'), ('canje', 'Canjes'), ('registro', 'Registros')] %}<option value="{{ k }}" {{ 'selected' if k == tipo }}>{{ v }}</option>{% endfor %}</select>
+  {% if lista_negocios %}<select name="negocio" aria-label="Negocio"><option value="">Todos los negocios</option>{% for n in lista_negocios %}<option value="{{ n.slug }}" {{ 'selected' if n.slug == slug }}>{{ n.nombre }}</option>{% endfor %}</select>{% endif %}
+  <button class="btn sec">Filtrar</button>
+</form>
+<section class="panel"><div class="panel-c">
+{% if r.filas %}{{ ui.actividad_lista(r.filas, lista_negocios is not none) }}{% else %}{% call ui.vacio("Sin actividad", "Todavía no hay movimientos para este filtro.", "activity") %}{% endcall %}{% endif %}</div>
+{% if r.filas %}<div class="pie-tabla"><span>Página {{ r.pagina }} de {{ r.paginas }} · {{ r.total }} movimientos</span>{{ ui.paginacion(r) }}</div>{% endif %}</section>
+{% endblock %}

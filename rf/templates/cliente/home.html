@@ -1,0 +1,18 @@
+{% extends "cliente/base.html" %}
+{% block cuerpo %}
+<h1>Hola, {{ c.nombre }}</h1>
+{% if sumo %}<p class="aviso" role="status">+{{ pts }} puntos y 1 sello por tu visita.{% if completa %} ¡Completaste tu tarjeta! Tu premio está más abajo.{% endif %}</p>
+{% elif ya %}<p class="aviso" role="status">Ya sumaste puntos por esta visita. Volvé en otra visita para sumar más.</p>
+{% else %}<p class="pista">Para sumar puntos y un sello, apoyá tu celular en el cartel del local.</p>{% endif %}
+<section class="tarjeta"><div class="puntos">{{ total }}</div><div>puntos{% if falta %} · te faltan {{ falta }} para tu próximo premio{% endif %}</div></section>
+{% include ["disenos/" ~ com.slug ~ "/_tarjeta.html", "cliente/_tarjeta.html"] %}
+{% if pendientes %}<h2>Tus canjes para mostrar en caja</h2>
+{% for p in pendientes %}<div class="fila"><span>{{ p.nombre }}</span><span class="codigo">{{ p.codigo }}</span></div>{% endfor %}{% endif %}
+<h2>Premios</h2>
+{% for p in premios %}<div class="fila"><span>{{ p.nombre }}<br><small>{{ p.costo }} puntos</small></span>
+<form method="post" action="{{ url_for('cliente.canjear', slug=com.slug, premio_id=p.id) }}">{{ csrf_input() }}<button {% if total < p.costo %}disabled{% endif %}>Canjear</button></form></div>
+{% else %}<p>El local todavía no cargó premios.</p>{% endfor %}
+{% if c.acepta_whatsapp %}<form method="post" action="{{ url_for('cliente.baja', slug=com.slug) }}">{{ csrf_input() }}
+<p><small>Recibís cupones e invitaciones por WhatsApp.</small></p><button class="sec">Dejar de recibir mensajes</button></form>
+{% else %}<p><small>No vas a recibir mensajes por WhatsApp.</small></p>{% endif %}
+{% endblock %}
