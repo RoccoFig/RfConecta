@@ -1,26 +1,24 @@
 """Todo lo visual que se calcula en Python: temas, logos, avatares y diseños a medida de cada negocio."""
-import json, os, re
+import os, re
 from flask import current_app, url_for
-from markupsafe import Markup, escape
+from markupsafe import Markup
+from . import temas
 
-TEMA_BASE = dict(fondo="#f2f4f1", tinta="#16322c", acento="#e0a526", linea="#cfd8d3", sup="#ffffff",
-                 radio="8px", fuente="system-ui,sans-serif", titulo="system-ui,sans-serif", icono="✓")
-
-
-def _tema_json(txt):
-    try:
-        return json.loads(txt or "{}")
-    except ValueError:
-        return {}
+TEMA_BASE = temas.normalizar({})
 
 
 def tema_de(com):
-    """Tema base (de respaldo) de un negocio: sirve cuando todavía no tiene diseño a medida."""
-    t = dict(TEMA_BASE, nombre="", tagline="")
-    if com is not None:
-        t.update(_tema_json(com["tema"]))
-        t["nombre"], t["tagline"] = com["nombre"], com["tagline"] or ""
+    """Tema completo y validado de un negocio (rf/temas.py). Lo usan todas las pantallas del cliente."""
+    t = temas.normalizar(temas.leer(com["tema"]) if com is not None else {})
+    t["nombre"], t["tagline"] = (com["nombre"], com["tagline"] or "") if com is not None else ("", "")
     return t
+
+
+def fondo_de(com):
+    """Dirección de la imagen de fondo del negocio, si subió una."""
+    if com is None or "tiene_fondo" not in com.keys() or not com["tiene_fondo"]:
+        return None
+    return url_for("cliente.fondo", slug=com["slug"], v=com["fondo_ver"] or 0)
 
 
 def info_diseno(slug):
@@ -52,7 +50,7 @@ def iniciales(nombre):
 def monograma(t):
     return Markup('<svg viewBox="0 0 48 48" width="50" height="50" role="img" aria-label="%s"><circle cx="24" cy="24" r="23" fill="%s"/>'
                   '<text x="24" y="31" text-anchor="middle" font-size="20" font-weight="700" font-family="Georgia,serif" fill="%s">%s</text></svg>'
-                  ) % (t["nombre"], t["acento"], t["tinta"], iniciales(t["nombre"]))
+                  ) % (t["nombre"], t["acento"], t["acento_texto"], iniciales(t["nombre"]))
 
 
 def logo_de(com, t):
@@ -72,9 +70,9 @@ def logo_de(com, t):
 
 def avatar(nombre, tema=None, slug=None, tiene_logo=False, ver=0, tam=34):
     """Miniatura cuadrada de un negocio para tablas y listas del panel."""
-    t = dict(TEMA_BASE, **_tema_json(tema))
+    t = temas.normalizar(temas.leer(tema))
     if tiene_logo and slug:
         return Markup('<img class="avatar" src="%s" alt="" width="%d" height="%d">') % (
             url_for("cliente.logo", slug=slug, v=ver or 0), tam, tam)
     return Markup('<span class="avatar" style="width:%dpx;height:%dpx;background:%s;color:%s">%s</span>') % (
-        tam, tam, t["acento"], t["tinta"], iniciales(nombre))
+        tam, tam, t["acento"], t["acento_texto"], iniciales(nombre))

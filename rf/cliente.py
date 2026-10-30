@@ -1,13 +1,13 @@
 """Lo que ve y hace el cliente final: registro, tarjeta de sellos, canje de premios, escaneo del cartel NFC
 y el pedido de visita por QR que confirma el personal. Toda suma de puntos pasa por rf.motor."""
 import hashlib, hmac, re, secrets, sqlite3
-from flask import (Blueprint, Response, abort, current_app, make_response, redirect, render_template, request,
+from flask import (Blueprint, Response, abort, current_app, g, make_response, redirect, render_template, request,
                    session, url_for)
-from . import motor, qr, sdm
+from . import motor, qr, sdm, temas
 from .db import ahora, db, transaccion
 from .mensajes import enviar_whatsapp
-from .presentacion import info_diseno, logo_de, tema_de
-from .seguridad import bloqueado, registrar_fallo
+from .presentacion import fondo_de, info_diseno, logo_de, tema_de
+from .seguridad import bloqueado, registrar_fallo, requiere_negocio
 
 bp = Blueprint("cliente", __name__)
 OTP_MINUTOS = 10
@@ -18,11 +18,21 @@ MENSAJES = {"intervalo": "Ya registraste una visita hace poco. Podés sumar la p
             "limite": "Pediste muchos códigos seguidos. Esperá un rato y probá de nuevo."}
 
 
-def render_cliente(vista, com, **ctx):
-    """Usa la plantilla propia del negocio (templates/disenos/<slug>/<vista>.html) si existe; si no, la base."""
-    t = tema_de(com)
+def render_cliente(vista, com, t=None, **ctx):
+    """Toda pantalla del cliente pasa por acá: recibe el tema del negocio (variables CSS + clases) y usa la plantilla
+    propia del negocio (templates/disenos/<slug>/<vista>.html) si existe; si no, la base, que ya toma el tema."""
+    t = t or tema_de(com)
+    fondo = fondo_de(com)
     return render_template([f"disenos/{com['slug']}/{vista}.html", f"cliente/{vista}.html"], com=com, t=t,
+                           tema_css=temas.css_tema(t, fondo), con_fondo=bool(fondo), vista=vista,
                            logo=logo_de(com, t), diseno=info_diseno(com["slug"]), **ctx)
+
+
+def datos_programa(com):
+    """Lo público del programa: reglas y premios activos. Es lo mismo que ve el cliente al registrarse."""
+    premios = db().execute("SELECT id, nombre, costo FROM premios WHERE comercio_id=? AND activo=1 ORDER BY costo", (com["id"],)).fetchall()
+    cfg = motor.config(com["id"])
+    return dict(premios=premios, pts=cfg["puntos"], tarjeta=cfg["sellos"], premio_tarjeta=cfg["premio"])
 
 
 def activo_o_pagina(com):
@@ -89,7 +99,9 @@ def local(slug):
         return p
     c = cliente_actual(com)
     if not c:
-        return render_cliente("registro", com, error=request.args.get("e"))
+        if session.get("scan_ok") == slug:  # apoyó el celular en el cartel: directo al registro, su visita lo espera
+            return render_cliente("registro", com, error=request.args.get("e"), escaneo=True, **datos_programa(com))
+        return render_cliente("inicio", com, **datos_programa(com))
     res = session.pop("resultado", None) or {}
     aviso = aviso_de(res) if res else None
     premios = db().execute("SELECT * FROM premios WHERE comercio_id=? AND activo=1 ORDER BY costo", (com["id"],)).fetchall()
@@ -106,13 +118,26 @@ def local(slug):
                           falta=(siguiente - total) if siguiente else None)
 
 
-@bp.post("/l/<slug>/registro")
+@bp.route("/registro/<slug>")
+def registro_pagina(slug):
+    """Página de registro propia de cada negocio. El negocio sale de la dirección y se valida acá, en el servidor."""
+    com = motor.comercio(slug)
+    if (p := activo_o_pagina(com)):
+        return p
+    if cliente_actual(com):
+        return redirect(url_for("cliente.local", slug=slug))
+    return render_cliente("registro", com, error=request.args.get("e"), escaneo=session.get("scan_ok") == slug, **datos_programa(com))
+
+
+@bp.route("/l/<slug>/registro", methods=["GET", "POST"])
 def registro(slug):
     com = motor.comercio(slug)
+    if request.method == "GET":
+        return redirect(url_for("cliente.registro_pagina", slug=slug))
     if activo_o_pagina(com):
         abort(404)
     def volver(msg):
-        return redirect(url_for("cliente.local", slug=slug, e=msg))
+        return redirect(url_for("cliente.registro_pagina", slug=slug, e=msg))
     if bloqueado("registro", MAX_REGISTROS_HORA, 3600):
         return volver("Demasiados intentos desde esta conexión. Probá de nuevo en un rato.")
     registrar_fallo("registro")  # cuenta cada intento: frena la creación masiva de cuentas
@@ -280,15 +305,61 @@ def escaneo():
     return tras_escaneo_valido(com, "nfc", f"nfc:{tag['id']}:{ctr}")
 
 
-@bp.route("/l/<slug>/logo")
-def logo(slug):
-    r = db().execute("SELECT logo_img, logo_mime FROM comercios WHERE slug=?", (slug,)).fetchone()
-    if not r or not r["logo_img"]:
+def _imagen(slug, campo):
+    r = db().execute(f"SELECT {campo}_img AS img, {campo}_mime AS mime FROM comercios WHERE slug=?", (slug,)).fetchone()
+    if not r or not r["img"]:
         abort(404)
-    resp = Response(r["logo_img"], mimetype=r["logo_mime"])
+    resp = Response(r["img"], mimetype=r["mime"])
     resp.headers["Cache-Control"] = "public, max-age=86400"
     resp.headers["X-Content-Type-Options"] = "nosniff"
     return resp
+
+
+@bp.route("/l/<slug>/logo")
+def logo(slug):
+    return _imagen(slug, "logo")
+
+
+@bp.route("/l/<slug>/fondo")
+def fondo(slug):
+    return _imagen(slug, "fondo")
+
+
+# ---------- vista previa del editor de diseño (solo el dueño de ESE negocio o la plataforma) ----------
+VISTAS = ("inicio", "registro", "tarjeta", "exito", "entrar")
+
+
+@bp.route("/l/<slug>/vista/<pagina>")
+@requiere_negocio
+def vista_previa(slug, pagina):
+    """Las pantallas reales del cliente, con datos de ejemplo y el tema que se está editando (sin guardarlo).
+    Los valores llegan por la dirección y pasan por la misma validación que al guardar."""
+    if pagina not in VISTAS:
+        abort(404)
+    com = dict(g.com)
+    crudo, _ = temas.combinar(request.args, temas.leer(com["tema"]))
+    if "tagline" in request.args:
+        com["tagline"] = request.args.get("tagline", "").strip()[:80]
+    if "nombre" in request.args and request.args.get("nombre", "").strip():
+        com["nombre"] = request.args["nombre"].strip()[:60]
+    if request.args.get("quitar_logo"):
+        com["tiene_logo"] = 0
+    if request.args.get("quitar_fondo"):
+        com["tiene_fondo"] = 0
+    t = temas.normalizar(crudo)
+    t["nombre"], t["tagline"] = com["nombre"], com["tagline"] or ""
+    ctx = dict(datos_programa(g.com), vista_previa=True, avisos_tema=temas.problemas(t))
+    if pagina in ("inicio", "registro", "entrar"):
+        return render_cliente(pagina, com, t=t, **ctx)
+    premios, pts, tarjeta = ctx["premios"], ctx["pts"], ctx["tarjeta"]
+    exito = pagina == "exito"
+    sellos = min(tarjeta - 1, 3) + (1 if exito else 0)
+    total = pts * sellos
+    siguiente = min((p["costo"] for p in premios if p["costo"] > total), default=None)
+    pend = [dict(codigo="K7M2QX", vence_en=ahora() + 7 * 86400, nombre=premios[0]["nombre"])] if premios else []
+    return render_cliente("home", com, t=t, c=dict(id=1, nombre="Ana", acepta_whatsapp=1), sumo=exito, ya=False,
+                          aviso=("ok", f"+{pts} puntos y 1 sello por tu visita.") if exito else None, total=total, pendientes=pend,
+                          sellos=sellos, completa=False, falta=(siguiente - total) if siguiente else None, **ctx)
 
 
 def registrar_modo_dev(app):

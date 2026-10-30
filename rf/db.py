@@ -57,7 +57,8 @@ COLUMNAS_NUEVAS = {
                   "logo_img": "BLOB", "logo_mime": "TEXT", "logo_ver": "INTEGER", "puntos_visita": "INTEGER",
                   "sellos_tarjeta": "INTEGER", "premio_tarjeta": "TEXT", "categoria": "TEXT", "creado": "INTEGER",
                   "estado": "TEXT NOT NULL DEFAULT 'activo'", "intervalo_horas": "REAL", "max_visitas_dia": "INTEGER",
-                  "clave_caja_hash": "TEXT", "canje_vence_dias": "INTEGER"},
+                  "clave_caja_hash": "TEXT", "canje_vence_dias": "INTEGER",
+                  "fondo_img": "BLOB", "fondo_mime": "TEXT", "fondo_ver": "INTEGER"},
     "tags": {"ultimo_escaneo": "INTEGER"},
     "canjes": {"entregado_en": "INTEGER", "comercio_id": "INTEGER", "vence_en": "INTEGER", "costo": "INTEGER NOT NULL DEFAULT 0",
                "resuelto_por": "TEXT"},
@@ -83,7 +84,7 @@ BEGIN SELECT RAISE(ABORT, 'El canje ya fue resuelto'); END;
 # columnas de un negocio sin el logo (que pesa); "tiene_logo" avisa si hay uno subido
 COLS_COM = ("id,slug,nombre,tagline,tema,logo_svg,logo_ver,dominio,clave_hash,puntos_visita,sellos_tarjeta,"
             "premio_tarjeta,categoria,creado,estado,clave_caja_hash,intervalo_horas,max_visitas_dia,canje_vence_dias,"
-            "(logo_img IS NOT NULL) AS tiene_logo")
+            "fondo_ver,(logo_img IS NOT NULL) AS tiene_logo,(fondo_img IS NOT NULL) AS tiene_fondo")
 
 
 def ahora():

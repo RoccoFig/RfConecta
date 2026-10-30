@@ -1,6 +1,9 @@
 {% extends "cliente/base.html" %}
+{% block titulo %}Entrar · {{ com.nombre }}{% endblock %}
 {% block cuerpo %}
-<h1>Entrar a mi cuenta</h1><p>Te mandamos un código por WhatsApp.</p>
-<form method="post">{{ csrf_input() }}<label>Teléfono<input name="telefono" type="tel" inputmode="tel" required autocomplete="tel"></label>
-<button>Enviar código</button></form>
+<h1>Entrar a mi cuenta</h1><p class="bajada">Te mandamos un código por WhatsApp.</p>
+<section class="tarjeta formulario">
+<form method="post" action="{{ url_for('cliente.entrar', slug=com.slug) }}">{{ csrf_input() }}<label>Teléfono<input name="telefono" type="tel" inputmode="tel" required autocomplete="tel"></label>
+<button>Enviar código</button></form></section>
+<p class="centro">¿Primera vez? <a href="{{ url_for('cliente.registro_pagina', slug=com.slug) }}">Creá tu cuenta</a></p>
 {% endblock %}

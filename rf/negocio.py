@@ -3,7 +3,7 @@ Dos niveles: el DUEÑO ve todo; la CAJA solo confirma visitas y entrega premios.
 import re
 from flask import Blueprint, Response, abort, flash, g, redirect, render_template, request, session, url_for
 from werkzeug.security import check_password_hash, generate_password_hash
-from . import motor, qr
+from . import motor, qr, temas
 from .db import db, ahora
 from .graficos import barras
 from .presentacion import logo_de, tema_de
@@ -14,7 +14,7 @@ bp = Blueprint("negocio", __name__, url_prefix="/negocio/<slug>")
 
 NAV = [(None, [("resumen", "Resumen", "layout-dashboard"), ("caja", "Caja", "scan-line"), ("clientes", "Clientes", "users"), ("actividad", "Actividad", "activity")]),
        ("Programa de lealtad", [("premios", "Premios", "gift"), ("canjes", "Canjes", "ticket"), ("carteles", "Carteles y QR", "nfc")]),
-       ("Cuenta", [("ajustes", "Ajustes", "settings")])]
+       ("Cuenta", [("diseno", "Diseño", "sparkles"), ("ajustes", "Ajustes", "settings")])]
 SOLO_CAJA = {"caja"}
 
 
@@ -314,6 +314,24 @@ def qr_svg(slug):
 def qr_imprimible(slug):
     t = tema_de(g.com)
     return render_template("negocio/qr_imprimible.html", url=qr.url_negocio(slug), qr_svg=qr.svg_en_linea(qr.url_negocio(slug), 8), t=t, logo=logo_de(g.com, t))
+
+
+# ---------- diseño: la identidad visual de ESTE negocio (el de la sesión, nunca uno elegido desde el formulario) ----------
+@bp.route("/diseno")
+@requiere_negocio
+def diseno(slug):
+    return render_template("negocio/diseno.html", titulo="Diseño", subtitulo="Tu identidad en todas las pantallas de tus clientes.",
+                           t=tema_de(g.com), opciones=temas.OPCIONES)
+
+
+@bp.post("/diseno")
+@requiere_negocio
+def diseno_guardar(slug):
+    error = temas.guardar_tema(g.com)
+    if not error:
+        motor.auditar("tema_modificado", "info", actor_actual(), g.com["id"])
+    flash(error or "Diseño guardado: ya se ve en todas las pantallas de tus clientes.", "error" if error else "ok")
+    return redirect(url_for("negocio.diseno", slug=slug))
 
 
 # ---------- ajustes ----------

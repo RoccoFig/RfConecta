@@ -22,6 +22,6 @@
 {% if not soporte %}<label class="campo"><span>Tu clave de dueño</span><input type="password" name="actual" required autocomplete="current-password"></label>{% endif %}
 <label class="campo"><span>Clave de caja nueva <small>(mínimo 8 caracteres, distinta de la tuya)</small></span><input type="password" name="nueva" required minlength="8" autocomplete="new-password"></label><button class="btn">Guardar clave de caja</button></form></div></section>
 <aside class="panel c6"><div class="panel-h"><h2>Tu negocio</h2></div><div class="panel-c"><div class="estado-lista"><div class="e"><div><small>Nombre</small><b>{{ com.nombre }}</b></div></div><div class="e"><div><small>Pantalla de tus clientes</small><b>/l/{{ com.slug }}</b></div></div></div>
-<p style="color:var(--muted);margin-top:14px">Para cambiar el nombre, el logo o el diseño, escribinos.</p></div></aside></div>
+<p style="color:var(--muted);margin-top:14px">El logo, los colores y el diseño de tus pantallas se cambian en <a href="{{ ruta('diseno') }}">Diseño</a>. Para cambiar el nombre, escribinos.</p></div></aside></div>
 {% endif %}
 {% endblock %}

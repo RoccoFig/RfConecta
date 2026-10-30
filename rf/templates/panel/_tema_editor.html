@@ -1,0 +1,70 @@
+{# Editor de la identidad visual de UN negocio. Lo usan la plataforma y el dueño (cada uno con su propia ruta protegida).
+   Variables: com, t (tema normalizado), opciones, accion (adónde se guarda), puede_nombre. #}
+{% import "panel/_ui.html" as ui with context %}
+{% macro elegir(nombre, etiqueta, ayuda='') -%}
+<label class="campo"><span>{{ etiqueta }}{% if ayuda %} <small>{{ ayuda }}</small>{% endif %}</span><select name="{{ nombre }}">
+{% for k, e in opciones[nombre].items() %}<option value="{{ k }}" {{ 'selected' if t[nombre] == k }}>{{ e }}</option>{% endfor %}</select></label>
+{%- endmacro %}
+{% macro color(nombre, etiqueta, ayuda='') -%}
+<label class="campo color"><span>{{ etiqueta }}{% if ayuda %} <small>{{ ayuda }}</small>{% endif %}</span><input type="color" name="{{ nombre }}" value="{{ t[nombre] }}"></label>
+{%- endmacro %}
+<div class="rejilla editor-tema">
+<form class="c7 editor-form" method="post" action="{{ accion }}" enctype="multipart/form-data" data-tema-editor>{{ csrf_input() }}
+<section class="panel"><div class="panel-h"><div><h2>Identidad de marca</h2><p class="sub">Se aplica a todas las pantallas de tus clientes: inicio, registro, ingreso, tarjeta y premios.</p></div></div>
+<div class="panel-c"><div class="form-g">
+{% if puede_nombre %}<label class="campo"><span>Nombre del negocio</span><input name="nombre" value="{{ com.nombre }}" maxlength="60" required></label>{% endif %}
+<label class="campo {{ '' if puede_nombre else 'ancho' }}"><span>Frase corta <small>(debajo del nombre)</small></span><input name="tagline" value="{{ com.tagline or '' }}" maxlength="80"></label>
+{{ elegir('tipografia', 'Tipografía') }}
+{{ elegir('estilo', 'Estilo visual', 'títulos, botones y tarjetas') }}
+<div class="campo ancho"><span>Logo <small>(PNG, JPG o WebP, hasta 400 KB)</small></span>
+<div class="archivo">{% if com.tiene_logo %}<img src="{{ url_for('cliente.logo', slug=com.slug, v=com.logo_ver or 0) }}" alt="Logo actual" width="44" height="44">{% endif %}
+<input type="file" name="logo" accept="image/png,image/jpeg,image/webp">
+{% if com.tiene_logo %}<label class="chk-p"><input type="checkbox" name="quitar_logo" value="1"> Quitar el logo actual</label>{% endif %}</div></div>
+</div></div></section>
+
+<section class="panel"><div class="panel-h"><div><h2>Colores</h2><p class="sub">Revisamos que el texto se lea bien; si no, te avisamos antes de guardar.</p></div></div>
+<div class="panel-c"><div class="form-g colores">
+{{ color('primario', 'Color principal', 'cabecera y botones') }}
+{{ color('acento', 'Color secundario', 'sellos y detalles') }}
+{{ color('fondo', 'Fondo de la página') }}
+{{ color('sup', 'Tarjetas y formularios') }}
+{{ color('tinta', 'Texto') }}
+{{ color('boton', 'Botones') }}
+{{ color('boton_texto', 'Letras de los botones', 'se ajusta solo si no se leen') }}
+</div></div></section>
+
+<section class="panel"><div class="panel-h"><div><h2>Páginas del cliente</h2><p class="sub">Los textos de tu página de inicio y de registro.</p></div></div>
+<div class="panel-c"><div class="form-g">
+<label class="campo ancho"><span>Título de la página de inicio <small>(vacío = texto automático)</small></span><input name="titular" value="{{ t.titular }}" maxlength="80" placeholder="Tus visitas a {{ com.nombre }} tienen premio"></label>
+<label class="campo ancho"><span>Texto de presentación</span><textarea name="bajada" maxlength="240" rows="2" placeholder="Creá tu cuenta gratis, sumá un sello en cada visita y canjeá tus puntos por premios.">{{ t.bajada }}</textarea></label>
+<label class="campo"><span>Texto del botón principal</span><input name="llamado" value="{{ t.llamado }}" maxlength="30" placeholder="Creá tu cuenta"></label>
+<label class="campo"><span>Ícono del sello <small>(un emoji o letra)</small></span><input name="icono" value="{{ t.icono }}" maxlength="8"></label>
+</div></div></section>
+
+<section class="panel"><div class="panel-h"><div><h2>Forma y disposición</h2><p class="sub">Botones, tarjetas, cabecera y espacios.</p></div></div>
+<div class="panel-c"><div class="form-g">
+{{ elegir('forma', 'Esquinas') }}
+{{ elegir('botones', 'Botones') }}
+{{ elegir('tarjetas', 'Tarjetas') }}
+{{ elegir('cabecera', 'Cabecera') }}
+{{ elegir('densidad', 'Espaciado') }}
+{{ elegir('decoracion', 'Decoración del fondo') }}
+<div class="campo ancho"><span>Imagen de cabecera <small>(PNG, JPG o WebP, hasta 500 KB; se tiñe con el color principal)</small></span>
+<div class="archivo">{% if com.tiene_fondo %}<img src="{{ url_for('cliente.fondo', slug=com.slug, v=com.fondo_ver or 0) }}" alt="Imagen actual" width="72" height="44" style="object-fit:cover">{% endif %}
+<input type="file" name="fondo_img" accept="image/png,image/jpeg,image/webp">
+{% if com.tiene_fondo %}<label class="chk-p"><input type="checkbox" name="quitar_fondo" value="1"> Quitar la imagen actual</label>{% endif %}</div></div>
+</div></div></section>
+
+<div class="barra-guardar"><span class="sin-guardar" data-sin-guardar hidden>Tenés cambios sin guardar</span>
+<button class="btn acento" data-guardar>Guardar diseño</button></div>
+</form>
+
+<section class="panel c5 vista-panel" aria-labelledby="vp-t"><div class="panel-h"><div><h2 id="vp-t">Vista previa</h2><p class="sub">Las pantallas reales de tus clientes, con los cambios sin guardar</p></div>
+<a class="btn sec chico" href="{{ url_for('cliente.local', slug=com.slug) }}" target="_blank" rel="noopener">{{ ui.ico('external-link') }}Abrir</a></div>
+<div class="panel-c">
+<div class="segmentos" role="group" aria-label="Pantalla">{% for k, e in [('inicio', 'Inicio'), ('registro', 'Registro'), ('tarjeta', 'Tarjeta'), ('exito', 'Visita sumada'), ('entrar', 'Ingreso')] %}<button type="button" data-vista-pagina="{{ k }}" aria-pressed="{{ 'true' if loop.first else 'false' }}">{{ e }}</button>{% endfor %}</div>
+<div class="segmentos" role="group" aria-label="Dispositivo"><button type="button" data-vista-equipo="celular" aria-pressed="true">Celular</button><button type="button" data-vista-equipo="escritorio" aria-pressed="false">Computadora</button></div>
+<div class="vista-caja" data-vista-caja><div class="telefono"><iframe data-vista-marco data-base="{{ url_for('cliente.vista_previa', slug=com.slug, pagina='__p__') }}"
+src="{{ url_for('cliente.vista_previa', slug=com.slug, pagina='inicio') }}" title="Vista previa de {{ com.nombre }}"></iframe></div></div>
+</div></section>
+</div>

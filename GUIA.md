@@ -13,13 +13,14 @@
       plataforma.py        panel de RF
       sdm.py               verificación de los carteles NTAG 424 DNA
       templates/panel      piezas compartidas de los dos paneles
-      templates/cliente    pantalla base del cliente
-      templates/disenos/   UN DISEÑO A MEDIDA POR NEGOCIO (una carpeta por negocio)
-      static/disenos/      estilos, logos e ilustraciones de cada negocio
+      temas.py             identidad visual de cada negocio: esquema del tema, validación y variables CSS
+      templates/cliente    pantallas del cliente (inicio, registro, ingreso, tarjeta); todas toman el tema del negocio
+      templates/disenos/   OPCIONAL: disposición a medida de un negocio (una carpeta por negocio)
+      static/disenos/      estilos, logos e ilustraciones de esos diseños a medida
     tools/nuevo_diseno.py  crea la carpeta de diseño de un negocio nuevo
     tools/respaldar.py     copia de seguridad verificada
     tools/verificar_integridad.py   control de coherencia de saldos y canjes
-    tests/                 102 pruebas automáticas (pytest) y el simulador de carteles NFC
+    tests/                 117 pruebas automáticas (pytest) y el simulador de carteles NFC
     docs/AUDITORIA.md      informe de seguridad: hallazgos, correcciones, riesgos que quedan
     docs/OPERACION.md      publicación, respaldos, retroceso y qué hacer ante una emergencia
 
@@ -29,7 +30,11 @@
     /negocio/<slug>        panel de cada negocio: el dueño ve todo; la caja solo ve «Caja»
     /negocio/<slug>/caja   confirmar visitas pedidas por QR y entregar premios
     /negocio/<slug>/qr     descargar el QR del negocio (PNG, SVG y versión para imprimir)
-    /l/<slug>              entrada permanente del negocio (la del QR impreso). Abrirla NO suma puntos
+    /negocio/<slug>/diseno el dueño edita la identidad visual de SU negocio (con vista previa)
+    /l/<slug>              entrada permanente del negocio (la del QR impreso). Sin cuenta: página de inicio
+                           del negocio; con cuenta: su tarjeta y premios. Abrirla NO suma puntos
+    /registro/<slug>       página de registro propia de cada negocio
+    /l/<slug>/vista/<p>    vista previa del editor (solo el dueño de ese negocio o la plataforma)
     /t?picc_data=...       link firmado que escribe cada cartel NFC
     /salud                 control de disponibilidad (no expone datos)
 
@@ -50,13 +55,17 @@ Si falta ADMIN_PASSWORD o SECRET_KEY en Render, la app se niega a arrancar a pro
 ## Cómo se crea el diseño de un negocio nuevo
 
 1. En /plataforma → Negocios → Nuevo negocio: cargá los datos (nombre, rubro, clave del dueño).
-2. En tu compu: python tools/nuevo_diseno.py <slug>
-3. Editá rf/templates/disenos/<slug>/_tarjeta.html y rf/static/disenos/<slug>/estilo.css.
-   Podés sumar un logo.svg y copiar cualquier plantilla de rf/templates/cliente/ para rehacerla entera
-   (registro.html, home.html, entrar.html, verificar.html). Lo que no crees usa la versión base.
-4. Probá en tu compu y subí los cambios a GitHub: Render publica solo.
+2. Te lleva a la pestaña Diseño: logo, colores, tipografía, estilo, botones, tarjetas, cabecera, imagen y textos
+   de la página de inicio. La vista previa muestra las pantallas reales (inicio, registro, tarjeta, visita
+   sumada, ingreso) en celular y computadora antes de guardar. Al guardar, cambian TODAS sus pantallas.
+   El dueño puede hacer lo mismo desde su panel (Diseño). Nadie puede tocar el diseño de otro negocio.
+3. No hace falta programar nada. El tema se guarda en comercios.tema y solo admite colores #rrggbb,
+   opciones de listas cerradas y textos (que se muestran escapados): no se puede inyectar CSS ni HTML.
 
-Ejemplos reales: rf/templates/disenos/cafe-brasa y rf/templates/disenos/helados-copo.
+Opcional, para una disposición realmente a medida (por ejemplo una tarjeta de sellos ilustrada):
+   python tools/nuevo_diseno.py <slug>   y editá rf/templates/disenos/<slug>/ y rf/static/disenos/<slug>/.
+   Usá las variables del tema (var(--primario), var(--acento)...) en vez de colores fijos.
+   Ejemplos: rf/templates/disenos/cafe-brasa y rf/templates/disenos/helados-copo.
 
 ## Probar en tu compu
 

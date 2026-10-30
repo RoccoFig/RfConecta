@@ -3,8 +3,8 @@
 {% block cuerpo %}
 <h1>Mostrá este código en caja</h1>
 <p>El personal lo escanea o lo escribe para confirmar tu visita. Es de un solo uso y vence a las <b>{{ hora(s.vence_en) }}</b>.</p>
-<section class="tarjeta" style="text-align:center">
-<div style="max-width:15rem;margin:0 auto">{{ qr_svg }}</div>
+<section class="tarjeta centro">
+<div class="qr-caja">{{ qr_svg }}</div>
 <div class="codigo" style="font-size:2rem;margin-top:.6rem" aria-label="Código {{ s.codigo }}">{{ s.codigo }}</div>
 <p class="pista" style="margin:.4rem 0 0">Esta pantalla se actualiza sola cuando te confirman.</p></section>
 <a href="{{ url_for('cliente.local', slug=com.slug) }}">Volver a mi tarjeta</a>

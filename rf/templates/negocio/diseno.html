@@ -1,0 +1,5 @@
+{% extends "panel/layout.html" %}{% import "panel/_ui.html" as ui with context %}
+{% block cuerpo %}
+{% set accion = ruta('diseno_guardar') %}{% set puede_nombre = False %}
+{% include "panel/_tema_editor.html" %}
+{% endblock %}

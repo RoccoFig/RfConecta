@@ -1,11 +1,14 @@
 <!doctype html><html lang="es"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="{{ t.tinta }}">
-<title>{{ com.nombre }}</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="{{ t.primario }}">
+<title>{% block titulo %}{{ com.nombre }}{% endblock %}</title>
 <link rel="stylesheet" href="{{ url_for('static', filename='css/cliente.css') }}">
-<style>:root{--fondo:{{ t.fondo }};--tinta:{{ t.tinta }};--acento:{{ t.acento }};--linea:{{ t.linea }};--sup:{{ t.sup }};--radio:{{ t.radio }};--fuente:{{ t.fuente }};--titulo:{{ t.titulo }}}</style>
+<style>{{ tema_css }}</style>
 {% if diseno.estilo %}<link rel="stylesheet" href="{{ diseno.estilo }}">{% endif %}
+{% if vista_previa %}<meta name="robots" content="noindex">{% endif %}
 {% block cabeza %}{% endblock %}</head>
-<body class="cliente d-{{ com.slug }}">
-{% block cabecera %}<header class="marca">{{ logo }}<div><strong>{{ com.nombre }}</strong><small>{{ com.tagline }}</small></div></header>{% endblock %}
+<body class="cliente d-{{ com.slug }} v-{{ vista }} {{ t.clases }}{{ ' con-fondo' if con_fondo }}{{ ' vista-previa' if vista_previa }}">
+{% if vista_previa and avisos_tema %}<div class="aviso-vista" role="alert">{% for a in avisos_tema %}<p>{{ a }}</p>{% endfor %}</div>{% endif %}
+{% block cabecera %}<header class="marca">{{ logo }}<div><strong>{{ com.nombre }}</strong>{% if com.tagline %}<small>{{ com.tagline }}</small>{% endif %}</div></header>{% endblock %}
 <main>{% block cuerpo %}{% endblock %}</main>
+{% block pie %}<footer class="pie"><span>Programa de lealtad de {{ com.nombre }}</span></footer>{% endblock %}
 </body></html>

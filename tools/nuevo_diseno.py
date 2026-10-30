@@ -26,12 +26,10 @@ TARJETA = '''{# __SLUG__ · tarjeta de lealtad. Variables: sellos (los que tiene
   <p>{% if sellos >= tarjeta %}¡Completa! Pedí tu premio: {{ premio_tarjeta }}{% else %}Faltan {{ tarjeta - sellos }} para {{ premio_tarjeta }}{% endif %}</p>
 </section>
 '''
-ESTILO = '''/* __SLUG__ — estilo propio. Las variables --fondo, --tinta, --acento, --linea, --sup y --radio vienen del tema base.
-   Todo lo de abajo de body.d-__SLUG__ cambia la pantalla ENTERA del cliente (registro, entrar, home). Probá cambiar el color. */
-body.d-__SLUG__{background:var(--fondo)}
-body.d-__SLUG__ .marca{background:var(--tinta);color:var(--fondo)}
-body.d-__SLUG__ h1,body.d-__SLUG__ h2{font-family:var(--titulo)}
-body.d-__SLUG__ button{background:var(--acento);color:var(--tinta)}
+ESTILO = '''/* __SLUG__ — disposición propia. Colores, letras y formas ya vienen del editor de Diseño (rf/temas.py) en TODAS las
+   pantallas: usá sus variables (--fondo, --tinta, --primario, --acento, --sup, --linea, --boton, --radio, --titulo...)
+   en vez de escribir colores, así un cambio en el editor se sigue viendo en todo. Lo de abajo de body.d-__SLUG__
+   afecta la pantalla ENTERA del cliente (inicio, registro, entrar, home). */
 
 /* La tarjeta de sellos: solo se ve DESPUÉS de crear la cuenta / entrar (pantalla home). */
 .__SLUG__-sellos{list-style:none;margin:.5rem 0;padding:0;display:grid;grid-template-columns:repeat(4,1fr);gap:.6rem}

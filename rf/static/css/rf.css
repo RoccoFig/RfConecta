@@ -126,6 +126,23 @@ table.tabla{width:100%;border-collapse:collapse;font-size:14px}
 .caja-codigo{background:var(--ink);color:#d8e2da;border-radius:var(--r-sm);padding:14px 16px;font:13px/1.7 ui-monospace,Menlo,monospace;overflow-x:auto}
 .cuadro-tema{display:flex;gap:6px}.cuadro-tema i{width:26px;height:26px;border-radius:7px;border:1px solid var(--line)}
 
+/* ---------- editor de diseño ---------- */
+.editor-form{display:flex;flex-direction:column;gap:16px}
+.editor-form textarea{font:inherit;resize:vertical}
+.campo.color input{height:42px;padding:3px;cursor:pointer}
+.archivo{display:flex;flex-wrap:wrap;align-items:center;gap:10px}.archivo img{border-radius:8px;border:1px solid var(--line);object-fit:contain;background:#fff}
+.archivo input[type=file]{flex:1;min-width:200px}.chk-p{display:flex;gap:6px;align-items:center;font-size:13px;color:var(--muted);font-weight:400}
+.barra-guardar{position:sticky;bottom:12px;z-index:4;display:flex;justify-content:flex-end;align-items:center;gap:12px;padding:12px 14px;
+  background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--sombra)}
+.sin-guardar{color:var(--muted);font-size:13px}
+.vista-panel{position:sticky;top:16px;align-self:start}
+.segmentos{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px}
+.segmentos button{font:600 12.5px var(--fuente);padding:6px 10px;border-radius:99px;border:1px solid var(--line);background:transparent;color:var(--muted);cursor:pointer}
+.segmentos button[aria-pressed=true]{background:var(--ink);border-color:var(--ink);color:#fff}
+.vista-caja{display:grid;place-items:center}
+.vista-caja.escritorio .telefono{width:100%;height:auto;aspect-ratio:16/10;border-width:6px;border-radius:12px;position:relative}
+.vista-caja.escritorio iframe{position:absolute;top:0;left:0;width:1280px;height:800px;transform-origin:0 0;transform:scale(var(--escala,.35))}
+
 /* ---------- diálogos y avisos ---------- */
 dialog{border:0;border-radius:var(--r);padding:0;width:min(520px,calc(100vw - 24px));box-shadow:0 30px 80px -20px rgba(0,0,0,.45);color:var(--text)}
 dialog::backdrop{background:rgba(13,19,16,.5);backdrop-filter:blur(2px)}

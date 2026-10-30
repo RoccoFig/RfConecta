@@ -1,0 +1,30 @@
+{% extends "cliente/base.html" %}
+{% block cuerpo %}
+<section class="hero">
+  <p class="eyebrow">Programa de lealtad</p>
+  <h1>{{ t.titular or ('Tus visitas a ' ~ com.nombre ~ ' tienen premio') }}</h1>
+  <p class="bajada">{{ t.bajada or 'Creá tu cuenta gratis, sumá un sello en cada visita y canjeá tus puntos por premios.' }}</p>
+  <div class="acciones">
+    <a class="boton" href="{{ url_for('cliente.registro_pagina', slug=com.slug) }}">{{ t.llamado or 'Creá tu cuenta' }}</a>
+    <a class="boton sec" href="{{ url_for('cliente.entrar', slug=com.slug) }}">Ya tengo cuenta</a>
+  </div>
+</section>
+
+<section class="tarjeta muestra" aria-labelledby="m-t">
+  <h2 id="m-t">Tu tarjeta de {{ tarjeta }} sellos</h2>
+  <div class="sellos" aria-hidden="true">{% for i in range(tarjeta) %}<span class="sello {{ 'on' if i < 2 }}">{{ t.icono if i < 2 else i + 1 }}</span>{% endfor %}</div>
+  <small>Al completarla ganás: <b>{{ premio_tarjeta }}</b>.</small>
+</section>
+
+<h2>Cómo funciona</h2>
+<ol class="pasos">
+  <li><b>Creá tu cuenta</b><span>Solo tu nombre y tu teléfono. Lleva un minuto.</span></li>
+  <li><b>Sumá en cada visita</b><span>Apoyá tu celular en el cartel del local o pedí tu visita en caja: {{ pts }} puntos y 1 sello.</span></li>
+  <li><b>Canjeá premios</b><span>Usá tus puntos cuando quieras y completá la tarjeta para ganar {{ premio_tarjeta }}.</span></li>
+</ol>
+
+{% if premios %}<h2>Premios</h2>
+<ul class="premios">{% for p in premios %}<li><span>{{ p.nombre }}</span><b>{{ p.costo }} pts</b></li>{% endfor %}</ul>{% endif %}
+
+<a class="boton" href="{{ url_for('cliente.registro_pagina', slug=com.slug) }}">{{ t.llamado or 'Creá tu cuenta' }}</a>
+{% endblock %}

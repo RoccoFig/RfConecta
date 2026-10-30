@@ -58,6 +58,38 @@
   // Imprimir (página del QR para imprimir)
   $$("[data-imprimir]").forEach(b => b.addEventListener("click", () => window.print()));
 
+  // Editor de diseño: la vista previa es la pantalla real del cliente, armada por el servidor con los valores sin guardar
+  const editor = $("[data-tema-editor]"), marco = $("[data-vista-marco]");
+  if (editor && marco) {
+    const caja = $("[data-vista-caja]");
+    let pagina = "inicio", espera;
+    const valores = () => {
+      const p = new URLSearchParams();
+      new FormData(editor).forEach((v, k) => { if (typeof v === "string" && k !== "csrf") p.append(k, v); });
+      return p;
+    };
+    const recargar = () => { marco.src = marco.dataset.base.replace("__p__", pagina) + "?" + valores(); };
+    const cambio = e => {
+      if (e.target.type === "file") return;
+      $("[data-sin-guardar]").hidden = false;
+      clearTimeout(espera); espera = setTimeout(recargar, 300);
+    };
+    editor.addEventListener("input", cambio);
+    editor.addEventListener("change", cambio);
+    const elegir = (sel, b) => $$(sel).forEach(x => x.setAttribute("aria-pressed", String(x === b)));
+    $$("[data-vista-pagina]").forEach(b => b.addEventListener("click", () => { pagina = b.dataset.vistaPagina; elegir("[data-vista-pagina]", b); recargar(); }));
+    // modo computadora: la página se arma a 1280 px de ancho y se achica para entrar en el recuadro
+    const pantalla = caja.querySelector(".telefono");
+    new ResizeObserver(() => caja.style.setProperty("--escala", pantalla.clientWidth / 1280)).observe(pantalla);
+    $$("[data-vista-equipo]").forEach(b => b.addEventListener("click", () => {
+      caja.classList.toggle("escritorio", b.dataset.vistaEquipo === "escritorio"); elegir("[data-vista-equipo]", b);
+    }));
+    editor.addEventListener("submit", () => {
+      const b = editor.querySelector("[data-guardar]");
+      setTimeout(() => { b.disabled = true; b.textContent = "Guardando…"; });  // después del envío, para no cancelarlo
+    });
+  }
+
   // Copiar al portapapeles
   $$("[data-copiar]").forEach(b => b.addEventListener("click", async () => {
     try { await navigator.clipboard.writeText(b.dataset.copiar); const t = b.textContent; b.textContent = "¡Copiado!"; setTimeout(() => b.textContent = t, 1400); } catch { /* sin permiso */ }

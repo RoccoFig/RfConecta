@@ -139,7 +139,7 @@ def negocio(slug):
     elif tab == "carteles":
         ctx["tags"] = motor.tags_lista(com["id"])
     elif tab == "diseno":
-        ctx.update(v=temas.valores_actuales(tema_de(com)), formas=temas.FORMAS, tipografias=temas.FUENTES)
+        ctx.update(t=tema_de(com), opciones=temas.OPCIONES)
     return render_template("plataforma/negocio.html", titulo=com["nombre"], subtitulo=f"{com['categoria'] or 'Negocio'} · /l/{slug}", **ctx)
 
 
@@ -197,8 +197,14 @@ def negocio_clave(slug):
 @bp.post("/negocios/<slug>/tema")
 @requiere_plataforma
 def negocio_tema(slug):
-    error = temas.guardar_tema(motor.comercio(slug))
-    flash(error or "Tema base guardado.", "error" if error else "ok")
+    com = motor.comercio(slug)
+    nombre = request.form.get("nombre", "").strip()[:60]
+    error = "El nombre no puede estar vacío." if "nombre" in request.form and not nombre else temas.guardar_tema(com)
+    if not error:
+        if nombre:
+            db().execute("UPDATE comercios SET nombre=? WHERE id=?", (nombre, com["id"]))
+        motor.auditar("tema_modificado", "info", "plataforma", com["id"])
+    flash(error or "Diseño guardado: ya se ve en todas las pantallas de sus clientes.", "error" if error else "ok")
     return _volver(slug, "diseno")
 
 

@@ -1,28 +1,133 @@
-/* Estructura común de la pantalla del cliente. Los colores y formas llegan como variables desde cada negocio. */
+/* Pantallas del cliente: UNA estructura para todos los negocios.
+   Colores, letras, formas y espaciado llegan como variables del tema de cada negocio (rf/temas.py → css_tema).
+   Las clases del <body> eligen variantes: e-* estilo, cab-* cabecera, bt-* botones, tj-* tarjetas, den-* espaciado, dec-* fondo.
+   Ningún color de negocio va escrito acá. */
+@font-face{font-family:"DM Sans";font-weight:100 1000;font-display:swap;src:url(../fonts/dm-sans-latin-wght-normal.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215}
+@font-face{font-family:"DM Sans";font-weight:100 1000;font-display:swap;src:url(../fonts/dm-sans-latin-ext-wght-normal.woff2) format("woff2");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:"Bricolage Grotesque";font-weight:200 800;font-display:swap;src:url(../fonts/bricolage-grotesque-latin-wght-normal.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215}
+@font-face{font-family:"Bricolage Grotesque";font-weight:200 800;font-display:swap;src:url(../fonts/bricolage-grotesque-latin-ext-wght-normal.woff2) format("woff2");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+
+/* valores de respaldo por si una plantilla a medida no carga el tema */
+:root{--fondo:#f2f4f1;--tinta:#16322c;--primario:var(--tinta);--primario-texto:#fff;--acento:#e0a526;--acento-texto:#141414;--sup:#fff;
+  --linea:#cfd8d3;--suave:#4f625c;--boton:var(--primario);--boton-texto:#fff;--resalte:var(--tinta);--radio:12px;--radio-boton:var(--radio);
+  --fuente:system-ui,sans-serif;--titulo:system-ui,sans-serif;--esp:1}
 *{box-sizing:border-box}
-body{margin:0;font:16px/1.5 var(--fuente);background:var(--fondo);color:var(--tinta);-webkit-text-size-adjust:100%}
-.marca{display:flex;align-items:center;gap:.85rem;padding:.9rem 1.25rem;padding-top:max(.9rem,env(safe-area-inset-top));background:var(--tinta);color:var(--fondo)}
-.marca strong{display:block;font:700 1.3rem/1.15 var(--titulo)}.marca small{opacity:.85}
-main{max-width:30rem;margin:0 auto;padding:1.25rem 1.25rem max(3rem,env(safe-area-inset-bottom))}
-h1{font:700 1.7rem/1.2 var(--titulo);margin:.2rem 0 1rem}h2{font:700 1.15rem/1.3 var(--titulo);margin:1.8rem 0 .6rem}
-a{color:var(--tinta)}.pista{opacity:.75;font-size:.92rem}
-.puntos{font:800 3.4rem/1 var(--titulo)}
-.tarjeta{background:var(--sup);border:1px solid var(--linea);border-radius:var(--radio);padding:1rem 1.1rem;margin:0 0 1rem}
+body{margin:0;font:16px/1.55 var(--fuente);background:var(--fondo);color:var(--tinta);-webkit-text-size-adjust:100%;min-height:100vh}
+
+/* ---------- cabecera ---------- */
+.marca{display:flex;align-items:center;gap:.85rem;padding:.9rem 1.25rem;padding-top:max(.9rem,env(safe-area-inset-top));background:var(--primario);color:var(--primario-texto)}
+.marca>img,.marca>svg{flex:none}
+.marca strong{display:block;font:700 1.3rem/1.15 var(--titulo)}.marca small{display:block;opacity:.85}
+.cab-limpia .marca{background:transparent;color:var(--tinta);max-width:30rem;margin:0 auto;border-bottom:1px solid var(--linea)}
+.cab-centrada .marca{flex-direction:column;text-align:center;gap:.55rem;padding-top:max(1.6rem,env(safe-area-inset-top));padding-bottom:1.3rem}
+.cab-centrada .marca>img,.cab-centrada .marca>svg{width:72px;height:72px}
+.cab-centrada .marca strong{font-size:1.55rem}
+.con-fondo .marca{background:linear-gradient(color-mix(in srgb,var(--primario) 62%,transparent),color-mix(in srgb,var(--primario) 88%,transparent)),var(--fondo-img) center/cover;
+  color:var(--primario-texto);padding-top:max(2.2rem,env(safe-area-inset-top));padding-bottom:2.2rem;max-width:none;border:0}
+
+/* ---------- estructura y texto ---------- */
+main{max-width:30rem;margin:0 auto;padding:calc(1.25rem*var(--esp)) 1.25rem max(2rem,env(safe-area-inset-bottom))}
+h1{font:700 1.7rem/1.15 var(--titulo);margin:.2rem 0 calc(.9rem*var(--esp));letter-spacing:-.01em}
+h2{font:700 1.15rem/1.3 var(--titulo);margin:calc(1.8rem*var(--esp)) 0 calc(.6rem*var(--esp))}
+p{margin:0 0 calc(1rem*var(--esp))}
+a{color:var(--resalte);text-underline-offset:.2em}
+.pista{color:var(--suave);font-size:.92rem}
+.bajada{font-size:1.05rem;color:var(--suave)}
+.centro{text-align:center}
+.eyebrow{font:700 .72rem/1 var(--fuente);letter-spacing:.16em;text-transform:uppercase;color:var(--resalte);margin:0 0 .7rem}
+.puntos{font:800 3.4rem/1 var(--titulo);color:var(--resalte)}
+.separador{border:0;border-top:1px solid var(--linea);margin:1.6rem 0 1rem}
+.pie{max-width:30rem;margin:0 auto;padding:.5rem 1.25rem max(1.5rem,env(safe-area-inset-bottom));text-align:center;font-size:.78rem;color:var(--suave)}
+
+/* ---------- tarjetas ---------- */
+.tarjeta{background:var(--sup);border:1px solid var(--linea);border-radius:var(--radio);padding:calc(1rem*var(--esp)) 1.1rem;margin:0 0 calc(1rem*var(--esp))}
 .tarjeta h2{margin-top:0}
-label{display:block;font-size:.92rem}
-input,button{font:inherit;width:100%;padding:.8rem;min-height:2.9rem;border:1px solid var(--linea);border-radius:var(--radio);margin:.25rem 0 .75rem;background:var(--sup);color:var(--tinta)}
-button{background:var(--tinta);color:#fff;border:0;font-weight:600;cursor:pointer}
-button.sec{background:var(--sup);color:var(--tinta);border:1px solid var(--linea)}
-button:disabled{background:var(--linea);color:#6b6b6b;cursor:not-allowed}
+.tj-sombra .tarjeta{border-color:transparent;box-shadow:0 1px 2px rgb(0 0 0/.06),0 10px 28px -10px rgb(0 0 0/.22)}
+.tj-plano .tarjeta{border-color:transparent}
+.tj-marco .tarjeta{border:2px solid var(--tinta);box-shadow:5px 5px 0 var(--tinta)}
+
+/* ---------- formularios y botones ---------- */
+label{display:block;font-size:.92rem;font-weight:600}
+input,button,.boton{font:inherit;width:100%;padding:.8rem;min-height:2.9rem;border:1px solid var(--linea);border-radius:var(--radio);margin:.25rem 0 .75rem;background:var(--sup);color:var(--tinta)}
+input{font-weight:400;background:var(--fondo)}
+button,.boton{display:flex;align-items:center;justify-content:center;text-align:center;text-decoration:none;
+  background:var(--boton);color:var(--boton-texto);border:2px solid var(--boton);border-radius:var(--radio-boton);font-weight:650;cursor:pointer}
+button.sec,.boton.sec{background:transparent;color:var(--tinta);border:1px solid var(--linea)}
+.bt-contorno button:not(.sec):not(:disabled),.bt-contorno .boton:not(.sec){background:transparent;color:var(--resalte);border-color:var(--resalte)}
+.bt-sombra button:not(:disabled),.bt-sombra .boton{box-shadow:3px 3px 0 var(--tinta)}
+.bt-sombra button:not(:disabled):active,.bt-sombra .boton:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--tinta)}
+button:disabled{background:transparent;border:1px dashed var(--linea);color:var(--suave);cursor:not-allowed;box-shadow:none}
 button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid var(--acento);outline-offset:2px}
-.fila{display:flex;justify-content:space-between;gap:1rem;align-items:center;padding:.6rem 0;border-bottom:1px solid var(--linea)}
-.fila form{width:8rem}.fila button{margin:0}
+.chk{display:flex;gap:.6rem;align-items:flex-start;font-size:.9rem;font-weight:400}.chk input{width:auto;min-height:0;margin-top:.3rem}
+.formulario form>button{margin-bottom:0}
+
+/* ---------- filas, avisos, códigos ---------- */
+.fila{display:flex;justify-content:space-between;gap:1rem;align-items:center;padding:calc(.6rem*var(--esp)) 0;border-bottom:1px solid var(--linea)}
+.fila form{width:8rem;flex:none}.fila button{margin:0}
+.premio>span{flex:1}
+.progreso{display:block;height:6px;border-radius:99px;background:var(--linea);overflow:hidden;margin-top:.35rem;max-width:12rem}
+.progreso i{display:block;height:100%;background:var(--acento);border-radius:99px}
 .aviso{background:var(--sup);border-left:4px solid var(--acento);border-radius:var(--radio);padding:.6rem .8rem;margin:0 0 1rem}
-.codigo{font:700 1.4rem ui-monospace,monospace;letter-spacing:.1em}
-.chk{display:flex;gap:.6rem;align-items:flex-start;font-size:.9rem}.chk input{width:auto;min-height:0;margin-top:.3rem}
-.sellos{display:grid;grid-template-columns:repeat(4,1fr);gap:.6rem;margin:.6rem 0}
-.sello{aspect-ratio:1;border:2px dashed var(--linea);border-radius:50%;display:grid;place-items:center;font-weight:800;color:#8a8a8a;font-size:1.3rem}
-.sello.on{background:var(--acento);border:2px solid var(--tinta);color:var(--tinta)}
-@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 .aviso.info{border-left-color:var(--linea)}.aviso.ok{border-left-color:#1b8a57}
-.qr{width:100%;height:auto;display:block}
+.codigo{font:700 1.4rem ui-monospace,monospace;letter-spacing:.1em}
+.qr{width:100%;height:auto;display:block}.qr-caja{max-width:15rem;margin:0 auto}
+
+/* ---------- tarjeta de sellos ---------- */
+.sellos{display:grid;grid-template-columns:repeat(4,1fr);gap:.6rem;margin:.6rem 0}
+.sello{aspect-ratio:1;border:2px dashed var(--linea);border-radius:50%;display:grid;place-items:center;font-weight:800;color:var(--suave);font-size:1.3rem}
+.sello.on{background:var(--acento);border:2px solid var(--tinta);color:var(--acento-texto)}
+
+/* ---------- página de inicio ---------- */
+.hero{padding:calc(.6rem*var(--esp)) 0 calc(1.2rem*var(--esp))}
+.hero h1{font-size:2.1rem;line-height:1.08}
+.acciones{display:grid;gap:.1rem}
+.acciones .boton{margin:.2rem 0}
+.muestra small{color:var(--suave)}
+.pasos{list-style:none;counter-reset:p;margin:0 0 1rem;padding:0;display:grid;gap:calc(.8rem*var(--esp))}
+.pasos li{counter-increment:p;display:grid;grid-template-columns:2.2rem 1fr;column-gap:.8rem}
+.pasos li::before{content:counter(p);grid-row:span 2;width:2.2rem;height:2.2rem;border-radius:var(--radio-boton);display:grid;place-items:center;
+  background:var(--primario);color:var(--primario-texto);font:800 1rem var(--titulo)}
+.pasos span{color:var(--suave);font-size:.93rem}
+.premios{list-style:none;margin:0 0 1.4rem;padding:0}
+.premios li{display:flex;justify-content:space-between;gap:1rem;padding:.65rem 0;border-bottom:1px solid var(--linea)}
+.premios b{color:var(--resalte);white-space:nowrap}
+
+/* ---------- estilos visuales ---------- */
+.e-editorial h1{font-weight:400;font-size:2.15rem;letter-spacing:-.025em}
+.e-editorial h2,.e-editorial .tarjeta h2{font:700 .74rem/1.2 var(--fuente);letter-spacing:.16em;text-transform:uppercase;color:var(--suave)}
+.e-editorial .puntos{font-weight:400;font-size:4rem}
+.e-editorial .marca strong{font-weight:400;letter-spacing:-.02em;font-size:1.6rem}
+.e-audaz h1,.e-audaz .hero h1{font-weight:900;text-transform:uppercase;letter-spacing:-.01em;line-height:.98;font-size:2.3rem}
+.e-audaz h2{font-weight:900;text-transform:uppercase;letter-spacing:.02em}
+.e-audaz .marca strong{font-weight:900;text-transform:uppercase;letter-spacing:.02em}
+.e-audaz .puntos{font-size:4.2rem;font-weight:900}
+.e-audaz button,.e-audaz .boton{text-transform:uppercase;letter-spacing:.06em;font-weight:800}
+.e-suave h1,.e-suave h2{font-weight:600}
+.e-suave .tarjeta{background:linear-gradient(160deg,var(--sup),color-mix(in srgb,var(--acento) 9%,var(--sup)))}
+.e-suave .sello.on{border-color:var(--acento)}
+
+/* ---------- espaciado ---------- */
+.den-compacta{--esp:.75}.den-amplia{--esp:1.35}
+
+/* ---------- decoración del fondo (solo con los colores del tema) ---------- */
+.dec-puntos{background-image:radial-gradient(color-mix(in srgb,var(--acento) 38%,transparent) 1.3px,transparent 1.6px);background-size:22px 22px;background-attachment:fixed}
+.dec-rayas{background-image:repeating-linear-gradient(135deg,color-mix(in srgb,var(--acento) 11%,transparent) 0 14px,transparent 14px 28px);background-attachment:fixed}
+.dec-circulos{background-image:radial-gradient(circle at 12% 6%,color-mix(in srgb,var(--acento) 24%,transparent) 0 130px,transparent 131px),
+  radial-gradient(circle at 94% 30%,color-mix(in srgb,var(--primario) 13%,transparent) 0 95px,transparent 96px);background-attachment:fixed}
+.dec-degradado{background-image:linear-gradient(180deg,color-mix(in srgb,var(--acento) 22%,var(--fondo)),var(--fondo) 520px);background-repeat:no-repeat}
+
+/* ---------- pantallas grandes: la misma página, más aire ---------- */
+@media (min-width:48rem){
+  main{max-width:34rem;padding-top:calc(2rem*var(--esp))}
+  .cab-barra .marca,.cab-centrada .marca{padding-left:max(1.25rem,calc(50% - 17rem));padding-right:max(1.25rem,calc(50% - 17rem))}
+  .cab-limpia .marca,.pie{max-width:34rem}
+  .hero h1{font-size:2.6rem}.e-audaz .hero h1{font-size:2.9rem}
+  .acciones{grid-template-columns:1fr 1fr;gap:.75rem}
+}
+
+/* ---------- vista previa del editor ---------- */
+.vista-previa form,.vista-previa a{pointer-events:none}
+.aviso-vista{position:sticky;top:0;z-index:5;background:#b42318;color:#fff;font:600 .82rem/1.35 system-ui,sans-serif;padding:.55rem .9rem}
+.aviso-vista p{margin:0}
+
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}

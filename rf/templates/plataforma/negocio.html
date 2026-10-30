@@ -43,26 +43,16 @@
 {% call ui.dialogo("dlg-clave-caja", "Nueva clave de caja", "Guardar clave", ruta('negocio_clave', slug=com.slug)) %}
 <input type="hidden" name="tipo" value="caja"><label class="campo"><span>Clave de caja <small>(mínimo 8 caracteres; distinta de la del dueño)</small></span><input type="password" name="clave" required minlength="8" autocomplete="new-password"></label>{% endcall %}
 {% elif tab == 'diseno' %}
-<div class="rejilla"><div class="c7" style="display:flex;flex-direction:column;gap:16px">
-<section class="panel"><div class="panel-h"><div><h2>Diseño a medida</h2><p class="sub">La pantalla que ve el cliente se programa para cada negocio.</p></div>{% if diseno.a_medida %}<span class="badge ok">A medida</span>{% else %}<span class="badge">Tema base</span>{% endif %}</div>
+{% set accion = ruta('negocio_tema', slug=com.slug) %}{% set puede_nombre = True %}
+{% include "panel/_tema_editor.html" %}
+<section class="panel"><div class="panel-h"><div><h2>Diseño programado a medida <small style="font-weight:400;color:var(--muted)">(opcional)</small></h2>
+<p class="sub">Para cambiar la disposición de una pantalla más allá del editor. Los colores, letras y formas siguen saliendo del editor de arriba.</p></div>
+{% if diseno.a_medida %}<span class="badge ok">Tiene archivos propios</span>{% else %}<span class="badge">Solo editor</span>{% endif %}</div>
 <div class="panel-c">
-{% if diseno.a_medida %}<p style="margin-bottom:10px">Este negocio tiene su propio diseño. Archivos que lo componen:</p>
+{% if diseno.a_medida %}<p style="margin-bottom:10px">Archivos que agregan disposición propia a este negocio:</p>
 <div class="caja-codigo">{% for f in diseno.plantillas %}rf/templates/disenos/{{ com.slug }}/{{ f }}<br>{% endfor %}{% for f in diseno.archivos %}rf/static/disenos/{{ com.slug }}/{{ f }}<br>{% endfor %}</div>
-<p style="margin-top:12px;color:var(--muted)">Cualquier plantilla que falte (registro, home, entrar…) usa la versión base. Editá estos archivos en tu compu y subí los cambios a GitHub.</p>
-{% else %}<p style="margin-bottom:10px">Todavía no tiene diseño propio: se muestra con el tema base de abajo. Para crearle uno, ejecutá en tu compu:</p>
-<div class="caja-codigo">python tools/nuevo_diseno.py {{ com.slug }}</div>
-<p style="margin-top:12px;color:var(--muted)">Eso crea la carpeta con una tarjeta de lealtad y un estilo de partida. Después los editás a gusto y los subís a GitHub.</p>{% endif %}</div></section>
-<section class="panel"><div class="panel-h"><div><h2>Tema base (respaldo)</h2><p class="sub">Se usa mientras no haya diseño propio y para los colores del panel del negocio.</p></div></div>
-<div class="panel-c"><form method="post" action="{{ ruta('negocio_tema', slug=com.slug) }}" enctype="multipart/form-data">{{ csrf_input() }}<div class="form-g">
-<label class="campo"><span>Fondo</span><input type="color" name="fondo" value="{{ v.fondo }}"></label><label class="campo"><span>Texto</span><input type="color" name="tinta" value="{{ v.tinta }}"></label>
-<label class="campo"><span>Color destacado</span><input type="color" name="acento" value="{{ v.acento }}"></label>
-<label class="campo"><span>Ícono del sello</span><input name="icono" value="{{ v.icono }}" maxlength="8"></label>
-<label class="campo"><span>Esquinas</span><select name="forma">{% for k, px in formas.items() %}<option value="{{ k }}" {{ 'selected' if v.forma == k }}>{{ {'recta': 'Rectas', 'suave': 'Suaves', 'redonda': 'Muy redondeadas'}[k] }}</option>{% endfor %}</select></label>
-<label class="campo"><span>Tipografía</span><select name="tipografia">{% for k in tipografias %}<option value="{{ k }}" {{ 'selected' if v.tipografia == k }}>{{ {'clasica': 'Clásica', 'moderna': 'Moderna', 'redondeada': 'Redondeada'}[k] }}</option>{% endfor %}</select></label>
-<label class="campo ancho"><span>Logo <small>(PNG, JPG o WebP, hasta 400 KB)</small></span><input type="file" name="logo" accept="image/png,image/jpeg,image/webp"></label></div>
-<button class="btn">Guardar tema base</button></form></div></section></div>
-<section class="panel c5"><div class="panel-h"><div><h2>Así lo ve el cliente</h2><p class="sub">Vista en vivo</p></div><a class="btn sec chico" href="{{ url_for('cliente.local', slug=com.slug) }}" target="_blank" rel="noopener">{{ ui.ico('external-link') }}Abrir</a></div>
-<div class="panel-c" style="display:grid;place-items:center"><div class="telefono"><iframe src="{{ url_for('cliente.local', slug=com.slug) }}" title="Vista previa de {{ com.nombre }}" loading="lazy"></iframe></div></div></section></div>
+<p style="margin-top:12px;color:var(--muted)">Cualquier plantilla que falte (inicio, registro, home, entrar…) usa la versión común con el tema del negocio.</p>
+{% else %}<p style="color:var(--muted)">No hace falta para que el negocio tenga identidad propia. Si alguna vez querés una tarjeta de sellos ilustrada a medida: <code>python tools/nuevo_diseno.py {{ com.slug }}</code></p>{% endif %}</div></section>
 
 {% elif tab == 'carteles' %}
 <div class="rejilla"><section class="panel c7"><div class="panel-h"><h2>Carteles de este negocio</h2></div><div class="panel-c sin"><div class="tabla-wrap">
