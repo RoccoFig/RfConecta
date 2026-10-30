@@ -150,6 +150,27 @@ def css_tema(t, fondo_url=None):
     return Markup(":root{%s}") % Markup(";".join(f"--{k}:{x}" for k, x in v.items()))
 
 
+RADIO_PANEL = {"recta": ("6px", "4px"), "suave": ("14px", "9px"), "redonda": ("20px", "13px")}
+
+
+def css_panel(t):
+    """Variables del panel del negocio (dueño y caja) a partir del MISMO tema que ven sus clientes.
+    El panel es una herramienta de trabajo: siempre queda claro y con texto oscuro, aunque la página del cliente sea
+    oscura o muy colorida. De la marca toma colores de acción, tipografía de títulos y forma; nada de efectos."""
+    claro = _lum(t["fondo"]) > 0.6
+    papel = mezclar(t["fondo"], "#ffffff", 0.35) if claro else mezclar("#f3f3f1", t["primario"], 0.05)
+    texto = t["tinta"] if claro and contraste(t["tinta"], "#ffffff") >= 7 else "#17201b"
+    tinta = next((c for c in (t["primario"], t["tinta"], t["boton"]) if contraste(c, "#ffffff") >= 7), "#0d1310")
+    marca_texto = next((c for c in (t["primario"], t["boton"], t["acento"]) if contraste(c, "#ffffff") >= 4.5), texto)
+    r, r_sm = RADIO_PANEL[t["forma"]]
+    v = {"marca": t["boton"], "marca-ink": t["boton_texto"], "marca-texto": marca_texto,
+         "marca-suave": mezclar("#ffffff", t["primario"], 0.1), "marca-2": t["acento"],
+         "ink": tinta, "ink-2": mezclar(tinta, "#ffffff", 0.08), "ink-3": mezclar(tinta, "#ffffff", 0.16),
+         "paper": papel, "line": mezclar(papel, texto, 0.13), "line-2": mezclar(papel, texto, 0.07), "neutro-bg": mezclar(papel, texto, 0.06),
+         "text": texto, "muted": mezclar(texto, "#ffffff", 0.36), "titulo-marca": t["titulo"], "r": r, "r-sm": r_sm}
+    return Markup(":root{%s}") % Markup(";".join(f"--{k}:{x}" for k, x in v.items()))
+
+
 def problemas(t):
     """Combinaciones que se leerían mal. Se avisan en la vista previa y no se dejan guardar."""
     p = []

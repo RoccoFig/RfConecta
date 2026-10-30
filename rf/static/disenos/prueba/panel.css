@@ -1,0 +1,18 @@
+/* prueba — detalles de «Alzá vuelo» en el panel del negocio (dueño y caja). Solo acentos de marca: el panel sigue
+   siendo una herramienta de trabajo clara y legible. Los colores base salen del tema (rf/temas.py → css_panel). */
+[data-negocio=prueba]{--pv-espectro:linear-gradient(90deg,#b4ec3c,#19c3df 28%,#5b2bd6 55%,#e13cc0 80%,#ffa24a)}
+[data-negocio=prueba] .lateral{border-top:0}  /* ya está posicionada (sticky / fija en celular): no tocar position */
+[data-negocio=prueba] .login{border-top:0;position:relative}
+[data-negocio=prueba] .lateral::before,[data-negocio=prueba] .login::before{content:"";position:absolute;inset:0 0 auto;height:4px;background:var(--pv-espectro)}
+[data-negocio=prueba] .marca-logo{border:2px solid transparent;border-radius:50%;
+  background:linear-gradient(#fff,#fff) padding-box,conic-gradient(#b4ec3c,#19c3df,#5b2bd6,#e13cc0,#ffa24a,#b4ec3c) border-box}
+[data-negocio=prueba] .nav a[aria-current=page]{background:linear-gradient(90deg,#efe8ff,#fbeefa)}
+/* acción principal: degradé violeta → magenta oscuro (texto blanco con contraste suficiente en todo el recorrido) */
+[data-negocio=prueba] .btn.acento{background:linear-gradient(115deg,#5b2bd6,#a1238c);border-color:transparent;color:#fff}
+[data-negocio=prueba] .btn.acento:hover{filter:brightness(1.08)}
+[data-negocio=prueba] .kpi{position:relative;overflow:hidden}
+[data-negocio=prueba] .kpi::before,[data-negocio=prueba] .caja-marca::before{content:"";position:absolute;inset:0 0 auto;height:3px;background:var(--pv-espectro)}
+[data-negocio=prueba] .caja-marca{position:relative;overflow:hidden;border-left-color:#5b2bd6}
+[data-negocio=prueba] .progreso-sellos .barra-r i,[data-negocio=prueba] .ranking .barra-r i{background:var(--pv-espectro);filter:none}
+[data-negocio=prueba] .principal{background:radial-gradient(40rem 22rem at 100% 0,rgb(91 43 214/.06),transparent 70%)}
+@media (max-width:900px){[data-negocio=prueba] .barra{border-top:0;box-shadow:inset 0 3px 0 #5b2bd6}}

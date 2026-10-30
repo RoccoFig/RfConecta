@@ -37,7 +37,7 @@ a{color:inherit}p{margin:0}
 .lateral-pie a,.lateral-pie button{color:#b7c2ba;display:flex;gap:10px;align-items:center;padding:8px 10px;border-radius:var(--r-sm);text-decoration:none;background:none;border:0;font:inherit;cursor:pointer;width:100%;text-align:left}
 .lateral-pie a:hover,.lateral-pie button:hover{background:var(--ink-2);color:#fff}
 .principal{min-width:0;display:flex;flex-direction:column}
-.barra{display:flex;align-items:center;gap:12px;padding:12px 28px;border-bottom:1px solid var(--line);background:rgba(242,241,234,.85);backdrop-filter:blur(8px);position:sticky;top:0;z-index:30}
+.barra{display:flex;align-items:center;gap:12px;padding:12px 28px;border-bottom:1px solid var(--line);background:color-mix(in srgb,var(--paper) 85%,transparent);backdrop-filter:blur(8px);position:sticky;top:0;z-index:30}
 .barra .migas{color:var(--muted);font-size:13px}.barra .espacio{flex:1}
 .contenido{padding:26px 28px 56px;max-width:1500px;width:100%}
 .cabecera-pagina{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:22px}
@@ -47,7 +47,27 @@ a{color:inherit}p{margin:0}
 [data-ambito=negocio] .lateral{background:#fff;color:var(--text);border-right:1px solid var(--line)}
 [data-ambito=negocio] .marca-rf{color:var(--text)}[data-ambito=negocio] .marca-rf small{color:var(--muted)}
 [data-ambito=negocio] .nav a{color:#4d5851}[data-ambito=negocio] .nav a:hover{background:var(--paper);color:var(--text)}
-[data-ambito=negocio] .nav a[aria-current=page]{background:var(--paper);color:var(--text)}
+[data-ambito=negocio] .nav a[aria-current=page]{background:var(--marca-suave,var(--paper));color:var(--text);box-shadow:inset 3px 0 0 var(--marca-texto,var(--marca))}
+[data-ambito=negocio] .nav a[aria-current=page] .i{color:var(--marca-texto,var(--marca))}
+[data-ambito=negocio] .lateral{border-top:4px solid var(--marca-texto,var(--marca))}
+/* la letra de la marca solo en títulos grandes y en el nombre; el resto del panel queda con la letra de lectura */
+[data-ambito=negocio] :is(.marca-rf b,.barra-marca b,.caja-marca b,.cabecera-pagina h1,.login h1){font-family:var(--titulo-marca,var(--titulo))}
+[data-ambito=negocio] .g-barra{fill:color-mix(in srgb,var(--marca-texto,var(--marca)) 28%,#fff)}
+[data-ambito=negocio] .g-barra:hover,[data-ambito=negocio] .g-hoy{fill:var(--marca-texto,var(--ink))}
+.marca-logo{border-radius:var(--r-sm);object-fit:contain;background:#fff;border:1px solid var(--line);flex:none}
+.barra-marca{display:none;align-items:center;gap:9px;text-decoration:none;color:var(--text);min-width:0}
+.barra-marca b{font:700 15px var(--titulo);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.barra-marca .marca-logo,.barra-marca .avatar{width:30px;height:30px}
+[data-ambito=negocio] .login{background:var(--paper);border-top:6px solid var(--marca-texto,var(--marca))}
+[data-ambito=negocio] .login .caja{box-shadow:var(--sombra);border:1px solid var(--line)}
+/* caja: lo que el personal toca muchas veces por día, grande y claro */
+.caja-marca{display:flex;align-items:center;gap:12px;padding:12px 16px;margin-bottom:16px;background:var(--card);border:1px solid var(--line);
+  border-left:5px solid var(--marca-texto,var(--marca));border-radius:var(--r);box-shadow:var(--sombra)}
+.caja-marca small{display:block;color:var(--muted);font-size:12px}.caja-marca b{font:700 18px var(--titulo)}
+.caja-ui .toolbar input{font-size:20px;letter-spacing:.14em;min-height:52px;text-transform:uppercase}
+.caja-ui .btn{min-height:48px;font-size:15px}.caja-ui .btn.chico{min-height:38px;font-size:13px}
+.caja-ui .dos{display:grid;grid-template-columns:2fr 1fr;gap:10px}
+.progreso-sellos{display:flex;align-items:center;gap:10px;margin-top:6px}.progreso-sellos .barra-r{flex:1;height:8px;border-radius:99px;background:var(--line-2);overflow:hidden}
+.progreso-sellos .barra-r i{display:block;height:100%;background:var(--marca-texto,var(--marca));border-radius:99px}
 [data-ambito=negocio] .nav-t{color:#8b968f}
 [data-ambito=negocio] .lateral-pie{border-color:var(--line)}[data-ambito=negocio] .lateral-pie a,[data-ambito=negocio] .lateral-pie button{color:#4d5851}
 [data-ambito=negocio] .lateral-pie a:hover,[data-ambito=negocio] .lateral-pie button:hover{background:var(--paper);color:var(--text)}
@@ -166,6 +186,8 @@ dialog::backdrop{background:rgba(13,19,16,.5);backdrop-filter:blur(2px)}
   body.menu-abierto .lateral{transform:none;visibility:visible;transition-delay:0s;box-shadow:12px 0 40px rgba(0,0,0,.35)}
   body.menu-abierto::after{content:"";position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:35}
   .menu-btn{display:inline-grid}.barra,.contenido,.banner-soporte{padding-left:16px;padding-right:16px}
+  [data-ambito=negocio] .barra-marca{display:flex}[data-ambito=negocio] .barra .migas{display:none}
+  [data-ambito=negocio] .barra{border-top:3px solid var(--marca-texto,var(--marca))}
 }
 @media (max-width:720px){
   .c3{grid-column:span 12}.form-g{grid-template-columns:1fr}.cabecera-pagina h1{font-size:24px}

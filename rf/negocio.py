@@ -6,7 +6,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from . import motor, qr, temas
 from .db import db, ahora
 from .graficos import barras
-from .presentacion import logo_de, tema_de
+from .presentacion import info_diseno, logo_de, logo_panel, tema_de
 from .seguridad import (actor_actual, bloqueado, destino_seguro, es_plataforma, iniciar, registrar_fallo,
                         requiere_negocio, verificar_negocio)
 
@@ -30,12 +30,20 @@ def es_dueno():
     return es_plataforma() or session.get("nivel") == "dueno"
 
 
+def marca_panel(com):
+    """Identidad del negocio para su panel: el mismo tema (rf/temas.py) y el mismo logo que ven sus clientes."""
+    return dict(marca_css=temas.css_panel(tema_de(com)), marca_logo=logo_panel(com),
+                marca_hoja=info_diseno(com["slug"])["panel"], marca_slug=com["slug"])
+
+
 @bp.context_processor
 def contexto():
-    slug = (request.view_args or {}).get("slug")
-    com = g.get("com") or (motor.comercio(slug) if slug else None)
+    # Solo g.com: lo fija requiere_negocio DESPUÉS de comprobar que la sesión es de este negocio (o de la plataforma).
+    # Nunca se arma la marca a partir de la dirección o de un campo del formulario sin esa comprobación.
+    com = g.get("com")
     if com is None:
         return {}
+    slug = com["slug"]
     ep = (request.endpoint or "").split(".")[-1]
     dentro = es_plataforma() or session.get("negocio") == slug
     pend = motor.un("SELECT COUNT(*) FROM canjes WHERE comercio_id=? AND estado='pendiente' AND vence_en>?", com["id"], ahora()) if dentro else 0
@@ -46,7 +54,8 @@ def contexto():
         if es_dueno() or n in SOLO_CAJA]) for t, items in NAV]
     return dict(ambito="negocio", nav=[x for x in grupos if x["items"]], marca_nombre=com["nombre"], marca_com=com, marca_tema=tema_de(com),
                 inicio_url=url_for("negocio.resumen" if es_dueno() else "negocio.caja", slug=slug), salir_url=url_for("negocio.salir", slug=slug),
-                soporte=es_plataforma(), ruta=lambda n, **k: url_for("negocio." + n, slug=slug, **k), com=com, es_dueno=es_dueno())
+                soporte=es_plataforma(), ruta=lambda n, **k: url_for("negocio." + n, slug=slug, **k), com=com, es_dueno=es_dueno(),
+                **marca_panel(com))
 
 
 # ---------- acceso ----------
@@ -71,7 +80,7 @@ def ingresar(slug):
             error = "Clave incorrecta."
     return render_template("panel/ingresar.html", titulo="Ingresar", encabezado=com["nombre"],
                            texto="Entrá al panel de tu programa de lealtad.", error=error,
-                           siguiente=request.args.get("siguiente", ""), marca=com), (429 if error and "Demasiados" in error else 200)
+                           siguiente=request.args.get("siguiente", ""), marca=com, **marca_panel(com)), (429 if error and "Demasiados" in error else 200)
 
 
 @bp.post("/salir")

@@ -39,7 +39,20 @@ def info_diseno(slug):
     return dict(
         plantillas=plantillas, archivos=archivos, a_medida=bool(plantillas or archivos),
         estilo=url("estilo.css") if "estilo.css" in archivos else None,
+        panel=url("panel.css") if "panel.css" in archivos else None,  # opcional: detalles de marca para su panel
         logo=url(logo) if logo else None)
+
+
+def logo_panel(com, tam=38):
+    """Logo del negocio en su panel y en su pantalla de ingreso, con la misma prioridad que ven los clientes:
+    el subido desde el editor > el del diseño a medida > iniciales con sus colores."""
+    if com["tiene_logo"]:
+        src = url_for("cliente.logo", slug=com["slug"], v=com["logo_ver"] or 0)
+    else:
+        src = info_diseno(com["slug"])["logo"]
+    if src:
+        return Markup('<img class="avatar marca-logo" src="%s" alt="" width="%d" height="%d">') % (src, tam, tam)
+    return avatar(com["nombre"], com["tema"], tam=tam)
 
 
 def iniciales(nombre):

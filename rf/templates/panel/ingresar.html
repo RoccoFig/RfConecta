@@ -1,8 +1,9 @@
 {% import "panel/_ui.html" as ui with context %}
 <!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex">
 <title>{{ titulo }} · {{ encabezado }}</title><link rel="stylesheet" href="{{ url_for('static', filename='css/rf.css') }}">
-<body><main class="login"><div class="caja">
-{% if marca %}{{ avatar(marca.nombre, marca.tema, marca.slug, marca.tiene_logo, marca.logo_ver, 46) }}{% else %}<span class="logo-rf" style="width:46px;height:46px;font-size:19px">RF</span>{% endif %}
+{% if marca %}<style>{{ marca_css }}</style>{% if marca_hoja %}<link rel="stylesheet" href="{{ marca_hoja }}">{% endif %}{% endif %}
+<body{% if marca %} data-ambito="negocio" data-negocio="{{ marca_slug }}"{% endif %}><main class="login"><div class="caja">
+{% if marca %}{{ marca_logo }}{% else %}<span class="logo-rf" style="width:46px;height:46px;font-size:19px">RF</span>{% endif %}
 <h1>{{ encabezado }}</h1><p class="sub">{{ texto }}</p>
 {% if error %}<div class="error-caja" role="alert">{{ error }}</div>{% endif %}
 <form method="post" autocomplete="off">{{ csrf_input() }}<input type="hidden" name="siguiente" value="{{ siguiente }}">

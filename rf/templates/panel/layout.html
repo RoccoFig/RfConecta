@@ -2,15 +2,15 @@
 <!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex">
 <title>{{ titulo }} · {{ marca_nombre }}</title>
 <link rel="stylesheet" href="{{ url_for('static', filename='css/rf.css') }}">
-{% if ambito == 'negocio' %}<style>:root{--marca:{{ marca_tema.acento }};--marca-ink:{{ marca_tema.tinta }}}</style>{% endif %}
+{% if ambito == 'negocio' %}<style>{{ marca_css }}</style>{% if marca_hoja %}<link rel="stylesheet" href="{{ marca_hoja }}">{% endif %}{% endif %}
 {% block cabeza %}{% endblock %}</head>
-<body data-ambito="{{ ambito }}">
+<body data-ambito="{{ ambito }}"{% if ambito == 'negocio' %} data-negocio="{{ marca_slug }}" data-nivel="{{ 'dueno' if es_dueno else 'caja' }}"{% endif %}>
 <a class="solo-lector" href="#contenido">Saltar al contenido</a>
 {% if soporte and ambito == 'negocio' %}<div class="banner-soporte">{{ ui.ico('shield-check') }}Estás viendo el panel de {{ marca_nombre }} como RF. <a href="{{ url_for('plataforma.negocio', slug=com.slug) }}"><b>Volver a la plataforma</b></a></div>{% endif %}
 <div class="app">
 <aside class="lateral" aria-label="Navegación principal">
   <a class="marca-rf" href="{{ inicio_url }}">
-    {% if ambito == 'negocio' %}{{ avatar(com.nombre, com.tema, com.slug, com.tiene_logo, com.logo_ver, 38) }}<span><b>{{ marca_nombre }}</b><small>Programa de lealtad</small></span>
+    {% if ambito == 'negocio' %}{{ marca_logo }}<span><b>{{ marca_nombre }}</b><small>{{ 'Programa de lealtad' if es_dueno else 'Caja' }}</small></span>
     {% else %}<span class="logo-rf">RF</span><span><b>RF Conecta</b><small>Plataforma</small></span>{% endif %}
   </a>
   <nav class="nav" aria-label="Secciones">{% for g in nav %}{% if g.titulo %}<div class="nav-t">{{ g.titulo }}</div>{% endif %}
@@ -23,7 +23,7 @@
 </aside>
 <div class="principal">
   <header class="barra"><button class="icono-btn menu-btn" data-menu aria-label="Abrir el menú">{{ ui.ico('menu') }}</button>
-    <span class="migas">{{ marca_nombre }} <span aria-hidden="true">/</span> {{ titulo }}</span><span class="espacio"></span>{% block barra %}{% endblock %}</header>
+    {% if ambito == 'negocio' %}<a class="barra-marca" href="{{ inicio_url }}">{{ marca_logo }}<b>{{ marca_nombre }}</b></a>{% endif %}<span class="migas">{{ marca_nombre }} <span aria-hidden="true">/</span> {{ titulo }}</span><span class="espacio"></span>{% block barra %}{% endblock %}</header>
   <main class="contenido" id="contenido">
     <div class="cabecera-pagina"><div><h1>{{ titulo }}</h1>{% if subtitulo %}<p class="sub">{{ subtitulo }}</p>{% endif %}</div><div class="acciones">{% block acciones %}{% endblock %}</div></div>
     {% block cuerpo %}{% endblock %}

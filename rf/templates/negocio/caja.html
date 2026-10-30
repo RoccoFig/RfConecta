@@ -1,13 +1,16 @@
 {% extends "panel/layout.html" %}{% import "panel/_ui.html" as ui with context %}
 {% block acciones %}<a class="btn sec" href="{{ ruta('caja') }}">{{ ui.ico('clock') }}Actualizar</a>{% endblock %}
 {% block cuerpo %}
+<div class="caja-ui">
+<div class="caja-marca">{{ marca_logo }}<div><small>Estás atendiendo en</small><b>{{ com.nombre }}</b></div></div>
 <div class="rejilla">
   <section class="panel c7"><div class="panel-h"><div><h2>Confirmar una visita</h2><p class="sub">El cliente toca «Registrar mi visita en caja» y te muestra su código.</p></div></div><div class="panel-c">
     <form method="get" class="toolbar"><input name="codigo" class="mono" value="{{ codigo }}" placeholder="Código de 6 letras o números" maxlength="12" autocomplete="off" aria-label="Código del cliente" {{ 'autofocus' if not sol }}><button class="btn acento">Buscar</button></form>
     {% if sol %}
     <div class="estado-lista" style="margin-bottom:14px">
       <div class="e"><div><small>Cliente</small><b>{{ sol.cliente }}</b></div><span class="mono">{{ sol.telefono_masc }}</span></div>
-      <div class="e"><div><small>Puntos actuales · visitas</small><b>{{ sol.puntos }} puntos · {{ sol.visitas }} visitas</b></div></div>
+      {% set en_tarjeta = ((sol.visitas - 1) % cfg.sellos) + 1 if sol.visitas else 0 %}<div class="e"><div style="flex:1"><small>Puntos actuales · tarjeta de sellos</small><b>{{ sol.puntos }} puntos · {{ en_tarjeta }} de {{ cfg.sellos }} sellos</b>
+        <div class="progreso-sellos" aria-hidden="true"><div class="barra-r"><i style="width:{{ (100 * en_tarjeta / cfg.sellos)|round|int }}%"></i></div><small>{{ sol.visitas }} visitas en total</small></div></div></div>
       <div class="e"><div><small>Código válido hasta</small><b>{{ hora(sol.vence_en) }}</b></div>
         {% if sol.elegible %}<span class="badge ok">Puede sumar</span>{% else %}<span class="badge warn">No puede sumar ahora</span>{% endif %}</div>
     </div>
@@ -27,4 +30,5 @@
 {% if pendientes %}<table class="tabla apilar"><thead><tr><th>Cliente</th><th>Código</th><th>Vence</th><th></th></tr></thead><tbody>
 {% for s in pendientes %}<tr><td class="principal-c"><b>{{ s.cliente }}</b></td><td class="mono" data-et="Código">{{ s.codigo }}</td><td data-et="Vence">{{ hora(s.vence_en) }}</td><td class="acc"><a class="btn sec chico" href="{{ ruta('caja', codigo=s.codigo) }}">Revisar</a></td></tr>{% endfor %}</tbody></table>
 {% else %}<p style="padding:18px;color:var(--muted)">No hay pedidos esperando.</p>{% endif %}</div></div></section>
+</div>
 {% endblock %}
