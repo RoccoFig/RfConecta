@@ -1,0 +1,48 @@
+{# prueba · tarjeta de lealtad #}
+<section class="tarjeta prueba-tarjeta" aria-labelledby="prueba-t">
+  <div class="tarjeta-header">
+    <div class="brand-info">
+      <img src="/static/disenos/prueba/logo.svg" alt="Logo {{ com.nombre if com else 'Negocio' }}" class="tarjeta-logo" />
+      <div>
+        <h2 id="prueba-t" class="tarjeta-titulo">{{ com.nombre if com else 'Tarjeta de Fidelización' }}</h2>
+        <span class="tarjeta-subtitulo">Suma sellos y obtené recompensas</span>
+      </div>
+    </div>
+    <div class="badge-progreso">
+      <span class="sellos-count">{{ sellos }}</span> / {{ tarjeta }}
+    </div>
+  </div>
+
+  <div class="tarjeta-body">
+    <ol class="prueba-sellos" role="img" aria-label="{{ sellos }} de {{ tarjeta }} sellos">
+      {% for i in range(tarjeta) %}
+        <li class="sello-item {{ 'on' if i < sellos }}{{ ' nuevo' if i == sellos - 1 and sumo }}" data-step="{{ i + 1 }}">
+          <div class="sello-inner">
+            {% if i < sellos %}
+              <span class="sello-icono">{{ t.icono if t and t.icono else '★' }}</span>
+            {% else %}
+              <span class="sello-numero">{{ i + 1 }}</span>
+            {% endif %}
+          </div>
+        </li>
+      {% endfor %}
+    </ol>
+  </div>
+
+  <div class="tarjeta-footer {{ 'completada' if sellos >= tarjeta }}">
+    {% if sellos >= tarjeta %}
+      <div class="premio-banner anim-pulse">
+        <span class="premio-icon">🎁</span>
+        <div>
+          <strong>¡Felicidades, tarjeta completa!</strong>
+          <p>Pedí tu premio: <span>{{ premio_tarjeta }}</span></p>
+        </div>
+      </div>
+    {% else %}
+      <div class="premio-info">
+        <span class="premio-icon">🎯</span>
+        <p>Te faltan <strong>{{ tarjeta - sellos }}</strong> {{ 'sello' if (tarjeta - sellos) == 1 else 'sellos' }} para desbloquear: <span>{{ premio_tarjeta }}</span></p>
+      </div>
+    {% endif %}
+  </div>
+</section>

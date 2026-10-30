@@ -1,0 +1,211 @@
+:root {
+  /* Paleta extraída del logo */
+  --p-primary: #5c24b5;
+  --p-primary-dark: #371077;
+  --p-cyan: #00bcd4;
+  --p-green: #26a69a;
+  --p-magenta: #e91e63;
+  
+  /* Gradiantes */
+  --p-gradient-main: linear-gradient(135deg, #2b1055 0%, #5c24b5 45%, #00bcd4 100%);
+  --p-gradient-accent: linear-gradient(135deg, #00bcd4 0%, #26a69a 50%, #8bc34a 100%);
+  --p-gradient-gold: linear-gradient(135deg, #ff9800 0%, #e91e63 100%);
+  --p-gradient-card: linear-gradient(145deg, #ffffff, #f4f6fc);
+
+  /* Estructura */
+  --p-radius-lg: 20px;
+  --p-radius-md: 12px;
+  --p-shadow: 0 10px 30px rgba(43, 16, 85, 0.15);
+  --p-shadow-active: 0 8px 20px rgba(0, 188, 212, 0.35);
+  
+  --p-text-main: #1f1a3a;
+  --p-text-muted: #6b6684;
+  --p-bg-sello-off: #eef2f8;
+  --p-border-off: #dbe2ef;
+}
+
+/* Modo oscuro opcional */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --p-gradient-card: linear-gradient(145deg, #1d1838, #120e26);
+    --p-text-main: #f0ecff;
+    --p-text-muted: #a39ebc;
+    --p-bg-sello-off: #28224b;
+    --p-border-off: #3c346b;
+  }
+}
+
+/* Contenedor principal de la tarjeta */
+.prueba-tarjeta {
+  background: var(--p-gradient-card);
+  border-radius: var(--p-radius-lg);
+  padding: 24px;
+  box-shadow: var(--p-shadow);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  max-width: 480px;
+  margin: 0 auto;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color: var(--p-text-main);
+  transition: all 0.3s ease;
+}
+
+/* Encabezado */
+.tarjeta-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.brand-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.tarjeta-logo {
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.15));
+}
+
+.tarjeta-titulo {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--p-text-main);
+  line-height: 1.2;
+}
+
+.tarjeta-subtitulo {
+  font-size: 0.78rem;
+  color: var(--p-text-muted);
+}
+
+.badge-progreso {
+  background: var(--p-gradient-main);
+  color: #fff;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(92, 36, 181, 0.25);
+}
+
+.sellos-count {
+  font-size: 1.05rem;
+  font-weight: 800;
+}
+
+/* Grilla de sellos */
+.prueba-sellos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+  gap: 12px;
+  list-style: none;
+  padding: 0;
+  margin: 0 0 24px 0;
+}
+
+.sello-item {
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--p-bg-sello-off);
+  border: 2px stroke var(--p-border-off);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.sello-inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+.sello-numero {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--p-text-muted);
+}
+
+.sello-icono {
+  font-size: 1.25rem;
+  color: #ffffff;
+}
+
+/* Estado: Activo / Completado */
+.sello-item.on {
+  background: var(--p-gradient-main);
+  border-color: transparent;
+  box-shadow: var(--p-shadow-active);
+  transform: scale(1.02);
+}
+
+/* Animación cuando recién suma un sello */
+.sello-item.nuevo {
+  animation: popSello 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  background: var(--p-gradient-gold);
+}
+
+@keyframes popSello {
+  0% { transform: scale(0.5); opacity: 0; }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1.02); opacity: 1; }
+}
+
+/* Footer & Premio */
+.tarjeta-footer {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--p-border-off);
+  border-radius: var(--p-radius-md);
+  padding: 14px 16px;
+}
+
+.premio-info, .premio-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.premio-icon {
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.premio-info p, .premio-banner p {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--p-text-muted);
+}
+
+.premio-info strong, .premio-banner span {
+  color: var(--p-text-main);
+}
+
+.tarjeta-footer.completada {
+  background: var(--p-gradient-accent);
+  border-color: transparent;
+  color: #ffffff;
+}
+
+.tarjeta-footer.completada .premio-banner p,
+.tarjeta-footer.completada .premio-banner strong,
+.tarjeta-footer.completada .premio-banner span {
+  color: #ffffff;
+}
+
+.anim-pulse {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.015); }
+  100% { transform: scale(1); }
+}
