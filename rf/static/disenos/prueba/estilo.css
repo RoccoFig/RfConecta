@@ -1,211 +1,117 @@
-:root {
-  /* Paleta extraída del logo */
-  --p-primary: #5c24b5;
-  --p-primary-dark: #371077;
-  --p-cyan: #00bcd4;
-  --p-green: #26a69a;
-  --p-magenta: #e91e63;
-  
-  /* Gradiantes */
-  --p-gradient-main: linear-gradient(135deg, #2b1055 0%, #5c24b5 45%, #00bcd4 100%);
-  --p-gradient-accent: linear-gradient(135deg, #00bcd4 0%, #26a69a 50%, #8bc34a 100%);
-  --p-gradient-gold: linear-gradient(135deg, #ff9800 0%, #e91e63 100%);
-  --p-gradient-card: linear-gradient(145deg, #ffffff, #f4f6fc);
+/* prueba — «Alzá vuelo». Inspirado en el logo: un pájaro hecho de plumas que van del violeta al magenta y del cian al lima.
+   El espectro del logo (fijo, es la firma de la marca) va en plumas, aurora, anillos y detalles. Texto, superficies y
+   botones siguen las variables del editor de Diseño (--tinta, --sup, --primario, --acento, --boton...).
+   Valores recomendados en el editor: principal #5b2bd6 · secundario #e13cc0 · fondo #f7f5ff · tarjetas #ffffff ·
+   texto #1d1442 · tipografía Grotesca · botones Píldora · tarjetas Flotantes · cabecera Centrada · estilo Suave. */
+.d-prueba{
+  --pv-violeta:#5b2bd6;--pv-magenta:#e13cc0;--pv-naranja:#ffa24a;--pv-cian:#19c3df;--pv-verde:#3ee08f;--pv-lima:#b4ec3c;
+  --pv-espectro:linear-gradient(100deg,var(--pv-lima),var(--pv-cian) 28%,var(--pv-violeta) 55%,var(--pv-magenta) 80%,var(--pv-naranja));
+  background-color:var(--fondo);
+  background-image:
+    radial-gradient(38rem 26rem at -8% -6%,color-mix(in srgb,var(--pv-violeta) 22%,transparent),transparent 70%),
+    radial-gradient(30rem 24rem at 108% 18%,color-mix(in srgb,var(--pv-cian) 20%,transparent),transparent 70%),
+    radial-gradient(34rem 26rem at 90% 104%,color-mix(in srgb,var(--pv-magenta) 18%,transparent),transparent 70%),
+    radial-gradient(26rem 20rem at -10% 80%,color-mix(in srgb,var(--pv-lima) 16%,transparent),transparent 70%);
+  background-attachment:fixed;position:relative;overflow-x:hidden}
 
-  /* Estructura */
-  --p-radius-lg: 20px;
-  --p-radius-md: 12px;
-  --p-shadow: 0 10px 30px rgba(43, 16, 85, 0.15);
-  --p-shadow-active: 0 8px 20px rgba(0, 188, 212, 0.35);
-  
-  --p-text-main: #1f1a3a;
-  --p-text-muted: #6b6684;
-  --p-bg-sello-off: #eef2f8;
-  --p-border-off: #dbe2ef;
-}
+/* plumas que flotan en el fondo */
+.d-prueba::before,.d-prueba::after{content:"";position:fixed;z-index:0;pointer-events:none;width:46px;height:138px;opacity:.5;background:no-repeat center/contain;
+  animation:pv-flotar 14s ease-in-out infinite}
+.d-prueba::before{top:16%;right:5%;transform:rotate(28deg);
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 120'%3E%3Cdefs%3E%3ClinearGradient id='a' x1='0' y1='1' x2='0' y2='0'%3E%3Cstop offset='0' stop-color='%236a2bd9'/%3E%3Cstop offset='1' stop-color='%23e13cc0'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M20 118C5 84 5 36 20 2c15 34 15 82 0 116z' fill='url(%23a)'/%3E%3Cpath d='M20 112V10' stroke='%23fff' stroke-opacity='.5' stroke-width='1.4'/%3E%3C/svg%3E")}
+.d-prueba::after{bottom:9%;left:4%;width:38px;height:114px;animation-delay:-6s;animation-duration:17s;transform:rotate(-34deg);
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 120'%3E%3Cdefs%3E%3ClinearGradient id='a' x1='0' y1='1' x2='0' y2='0'%3E%3Cstop offset='0' stop-color='%2316a9c4'/%3E%3Cstop offset='1' stop-color='%23b4ec3c'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M20 118C5 84 5 36 20 2c15 34 15 82 0 116z' fill='url(%23a)'/%3E%3Cpath d='M20 112V10' stroke='%23fff' stroke-opacity='.5' stroke-width='1.4'/%3E%3C/svg%3E")}
+@keyframes pv-flotar{0%,100%{translate:0 0;rotate:0deg}50%{translate:-10px 22px;rotate:9deg}}
+.d-prueba .marca,.d-prueba main,.d-prueba .pie,.d-prueba .aviso-vista{position:relative;z-index:1}
 
-/* Modo oscuro opcional */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --p-gradient-card: linear-gradient(145deg, #1d1838, #120e26);
-    --p-text-main: #f0ecff;
-    --p-text-muted: #a39ebc;
-    --p-bg-sello-off: #28224b;
-    --p-border-off: #3c346b;
-  }
-}
+/* cabecera: vidrio claro, logo con anillo de colores y nombre en el espectro del logo */
+.d-prueba:not(.con-fondo) .marca{background:color-mix(in srgb,var(--sup) 72%,transparent);color:var(--tinta);
+  -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);box-shadow:0 1px 0 color-mix(in srgb,var(--pv-violeta) 14%,transparent)}
+.d-prueba .marca::after{content:"";position:absolute;left:0;right:0;bottom:0;height:3px;background:var(--pv-espectro)}
+.d-prueba .marca>img{border-radius:50%;object-fit:cover;border:3px solid transparent;
+  background:linear-gradient(#fff,#fff) padding-box,conic-gradient(from 200deg,var(--pv-lima),var(--pv-cian),var(--pv-violeta),var(--pv-magenta),var(--pv-naranja),var(--pv-lima)) border-box;
+  box-shadow:0 8px 22px -8px color-mix(in srgb,var(--pv-violeta) 60%,transparent)}
+.d-prueba:not(.con-fondo) .marca strong{background:linear-gradient(95deg,var(--pv-violeta),var(--pv-magenta) 60%,var(--pv-naranja));
+  -webkit-background-clip:text;background-clip:text;color:transparent;letter-spacing:-.01em}
 
-/* Contenedor principal de la tarjeta */
-.prueba-tarjeta {
-  background: var(--p-gradient-card);
-  border-radius: var(--p-radius-lg);
-  padding: 24px;
-  box-shadow: var(--p-shadow);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  max-width: 480px;
-  margin: 0 auto;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  color: var(--p-text-main);
-  transition: all 0.3s ease;
-}
+/* títulos con estela de color */
+.d-prueba h1{background:linear-gradient(100deg,var(--tinta) 35%,var(--pv-violeta) 70%,var(--pv-magenta));-webkit-background-clip:text;background-clip:text;color:transparent}
+.d-prueba h1::after{content:"";display:block;width:3.2rem;height:5px;border-radius:99px;margin-top:.55rem;background:var(--pv-espectro)}
+.d-prueba .eyebrow{background:var(--pv-espectro);-webkit-background-clip:text;background-clip:text;color:transparent}
 
-/* Encabezado */
-.tarjeta-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 24px;
-}
+/* tarjetas de vidrio con filo de color */
+.d-prueba .tarjeta{position:relative;overflow:hidden;border:1px solid color-mix(in srgb,var(--pv-violeta) 12%,transparent);
+  background:color-mix(in srgb,var(--sup) 88%,transparent);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
+  box-shadow:0 18px 40px -22px color-mix(in srgb,var(--pv-violeta) 55%,transparent)}
+.d-prueba .tarjeta::before{content:"";position:absolute;inset:0 0 auto;height:4px;background:var(--pv-espectro)}
 
-.brand-info {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
+/* botones: degradé del color principal al secundario, con brillo al pasar */
+.d-prueba button:not(.sec):not(:disabled),.d-prueba .boton:not(.sec){border:0;color:#fff;text-shadow:0 1px 1px rgb(0 0 0/.18);
+  background:linear-gradient(115deg,var(--boton),var(--acento));background-size:160% 100%;
+  box-shadow:0 10px 24px -10px color-mix(in srgb,var(--boton) 80%,transparent);transition:background-position .4s,transform .15s}
+.d-prueba button:not(.sec):not(:disabled):hover,.d-prueba .boton:not(.sec):hover{background-position:100% 0}
+.d-prueba button:not(.sec):not(:disabled):active,.d-prueba .boton:not(.sec):active{transform:scale(.98)}
+.d-prueba button.sec,.d-prueba .boton.sec{background:color-mix(in srgb,var(--sup) 80%,transparent)}
+.d-prueba input:focus-visible{outline-color:var(--pv-violeta)}
 
-.tarjeta-logo {
-  width: 44px;
-  height: 44px;
-  object-fit: contain;
-  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.15));
-}
+/* detalles del resto de las pantallas */
+.d-prueba .puntos{background:linear-gradient(120deg,var(--pv-violeta),var(--pv-magenta));-webkit-background-clip:text;background-clip:text;color:transparent}
+.d-prueba .aviso{border-left:0;padding-left:1rem;position:relative;overflow:hidden}
+.d-prueba .aviso::before{content:"";position:absolute;inset:0 auto 0 0;width:5px;background:var(--pv-espectro)}
+.d-prueba .progreso i{background:var(--pv-espectro)}
+.d-prueba .premios b{background:linear-gradient(120deg,var(--pv-violeta),var(--pv-magenta));-webkit-background-clip:text;background-clip:text;color:transparent}
+.d-prueba .pasos li::before{background:linear-gradient(140deg,var(--pv-violeta),var(--pv-magenta));color:#fff;box-shadow:0 6px 14px -6px var(--pv-violeta)}
+.d-prueba .pasos li:nth-child(2)::before{background:linear-gradient(140deg,var(--pv-cian),var(--pv-violeta))}
+.d-prueba .pasos li:nth-child(3)::before{background:linear-gradient(140deg,var(--pv-verde),var(--pv-cian))}
+.d-prueba .sello{border-color:color-mix(in srgb,var(--pv-violeta) 22%,var(--linea))}
+.d-prueba .sello.on{border:0;color:#fff;background:linear-gradient(150deg,var(--pv-violeta),var(--pv-magenta))}
+.d-prueba .sello.on:nth-child(2n){background:linear-gradient(150deg,var(--pv-cian),var(--pv-violeta))}
+.d-prueba .pie::before{content:"✦ ";color:var(--pv-magenta)}
 
-.tarjeta-titulo {
-  margin: 0;
-  font-size: 1.15rem;
-  font-weight: 700;
-  color: var(--p-text-main);
-  line-height: 1.2;
-}
+/* ---------- la tarjeta «Alzá vuelo» ---------- */
+.pv-tarjeta{padding-top:1.3rem}
+.pv-cabeza{display:flex;align-items:center;gap:.75rem}
+.pv-logo{flex:none;width:46px;height:46px;border-radius:50%;object-fit:cover;border:2px solid transparent;
+  background:linear-gradient(#fff,#fff) padding-box,conic-gradient(var(--pv-lima),var(--pv-cian),var(--pv-violeta),var(--pv-magenta),var(--pv-naranja),var(--pv-lima)) border-box}
+.pv-logo-txt{display:grid;place-items:center;font-size:1.3rem}
+.pv-titulos{flex:1;min-width:0}
+.pv-eyebrow{margin:0 0 .15rem;font:700 .66rem/1.2 var(--fuente);letter-spacing:.16em;text-transform:uppercase;color:var(--suave)}
+.pv-tarjeta h2{margin:0;font-size:1.25rem}
+.pv-contador{flex:none;padding:.35rem .75rem;border-radius:99px;color:#fff;font-size:.85rem;background:linear-gradient(120deg,var(--pv-violeta),var(--pv-magenta));
+  box-shadow:0 6px 16px -6px var(--pv-violeta)}
+.pv-contador b{font-size:1.05rem}
 
-.tarjeta-subtitulo {
-  font-size: 0.78rem;
-  color: var(--p-text-muted);
-}
+.pv-ala{display:block;width:100%;height:auto;margin:.4rem 0 .2rem;overflow:visible}
+.pv-pluma:not(.on) path:first-child{fill:transparent;stroke:color-mix(in srgb,var(--pv-violeta) 30%,var(--linea));stroke-width:1.6;stroke-dasharray:4 5}
+.pv-pluma .pv-raquis{stroke:color-mix(in srgb,var(--pv-violeta) 18%,var(--linea));stroke-width:1.2;fill:none}
+.pv-pluma.on path:first-child{stroke:rgb(255 255 255/.55);stroke-width:1;stroke-dasharray:none;filter:drop-shadow(0 3px 4px rgb(43 16 112/.25))}
+.pv-pluma.on .pv-raquis{stroke:rgb(255 255 255/.6)}
+.pv-pluma.on path{animation:pv-respira 5s ease-in-out infinite;animation-delay:calc(var(--i) * -.4s)}
+.pv-pluma.nueva path{animation:pv-crece .9s cubic-bezier(.2,1.3,.4,1) both}
+@keyframes pv-crece{from{transform:scale(.05);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes pv-respira{0%,100%{transform:rotate(0)}50%{transform:rotate(1.6deg)}}
+.pv-cuerpo{filter:drop-shadow(0 4px 8px rgb(43 16 112/.35))}
+.pv-cuerpo-txt{font-size:13px;fill:#fff}
 
-.badge-progreso {
-  background: var(--p-gradient-main);
-  color: #fff;
-  padding: 6px 14px;
-  border-radius: 20px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  box-shadow: 0 4px 12px rgba(92, 36, 181, 0.25);
-}
+.pv-ruta{position:relative;height:34px;margin:.5rem 2.2rem .4rem .4rem}
+.pv-estela{position:absolute;left:0;right:0;top:50%;height:6px;transform:translateY(-50%);border-radius:99px;
+  background:repeating-linear-gradient(90deg,color-mix(in srgb,var(--pv-violeta) 22%,var(--linea)) 0 8px,transparent 8px 14px)}
+.pv-estela i{display:block;height:100%;border-radius:99px;background:var(--pv-espectro)}
+.pv-pajaro{position:absolute;top:50%;transform:translate(-50%,-55%);animation:pv-aletea 2.4s ease-in-out infinite;line-height:0}
+.pv-pajaro img{width:30px;height:30px;border-radius:50%;background:#fff;box-shadow:0 4px 12px -2px rgb(43 16 112/.4)}
+@keyframes pv-aletea{0%,100%{margin-top:0}50%{margin-top:-5px}}
+.pv-meta{position:absolute;right:-2.1rem;top:50%;transform:translateY(-50%);font-size:1.3rem}
+.pv-pie{margin:.5rem 0 0;font-size:.95rem}
+.pv-pie b{color:var(--resalte)}
 
-.sellos-count {
-  font-size: 1.05rem;
-  font-weight: 800;
-}
+/* ala completa: brillo y lluvia de plumas */
+.pv-completa{box-shadow:0 0 0 2px color-mix(in srgb,var(--pv-magenta) 40%,transparent),0 22px 48px -18px var(--pv-violeta)}
+.pv-completa .pv-ala{animation:pv-brilla 2.6s ease-in-out infinite}
+@keyframes pv-brilla{0%,100%{filter:none}50%{filter:drop-shadow(0 0 10px color-mix(in srgb,var(--pv-magenta) 55%,transparent))}}
+.pv-confeti{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.pv-confeti i{position:absolute;top:-24px;left:calc(5% + var(--k) * 9.5%);width:7px;height:20px;border-radius:50% 50% 50% 50%/80% 80% 20% 20%;
+  background:var(--pv-espectro);background-size:1000% 100%;background-position:calc(var(--k) * 11%) 0;
+  animation:pv-cae 3.6s linear infinite;animation-delay:calc(var(--k) * -.37s)}
+@keyframes pv-cae{from{transform:translateY(0) rotate(0)}to{transform:translateY(440px) rotate(540deg)}}
 
-/* Grilla de sellos */
-.prueba-sellos {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
-  gap: 12px;
-  list-style: none;
-  padding: 0;
-  margin: 0 0 24px 0;
-}
-
-.sello-item {
-  aspect-ratio: 1;
-  border-radius: 50%;
-  background: var(--p-bg-sello-off);
-  border: 2px stroke var(--p-border-off);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-.sello-inner {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 100%;
-}
-
-.sello-numero {
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: var(--p-text-muted);
-}
-
-.sello-icono {
-  font-size: 1.25rem;
-  color: #ffffff;
-}
-
-/* Estado: Activo / Completado */
-.sello-item.on {
-  background: var(--p-gradient-main);
-  border-color: transparent;
-  box-shadow: var(--p-shadow-active);
-  transform: scale(1.02);
-}
-
-/* Animación cuando recién suma un sello */
-.sello-item.nuevo {
-  animation: popSello 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-  background: var(--p-gradient-gold);
-}
-
-@keyframes popSello {
-  0% { transform: scale(0.5); opacity: 0; }
-  50% { transform: scale(1.2); }
-  100% { transform: scale(1.02); opacity: 1; }
-}
-
-/* Footer & Premio */
-.tarjeta-footer {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid var(--p-border-off);
-  border-radius: var(--p-radius-md);
-  padding: 14px 16px;
-}
-
-.premio-info, .premio-banner {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.premio-icon {
-  font-size: 1.5rem;
-  line-height: 1;
-}
-
-.premio-info p, .premio-banner p {
-  margin: 0;
-  font-size: 0.88rem;
-  color: var(--p-text-muted);
-}
-
-.premio-info strong, .premio-banner span {
-  color: var(--p-text-main);
-}
-
-.tarjeta-footer.completada {
-  background: var(--p-gradient-accent);
-  border-color: transparent;
-  color: #ffffff;
-}
-
-.tarjeta-footer.completada .premio-banner p,
-.tarjeta-footer.completada .premio-banner strong,
-.tarjeta-footer.completada .premio-banner span {
-  color: #ffffff;
-}
-
-.anim-pulse {
-  animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.015); }
-  100% { transform: scale(1); }
-}
+@media (min-width:48rem){.d-prueba::before{right:12%}.d-prueba::after{left:12%}}

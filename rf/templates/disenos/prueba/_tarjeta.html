@@ -1,48 +1,48 @@
-{# prueba · tarjeta de lealtad #}
-<section class="tarjeta prueba-tarjeta" aria-labelledby="prueba-t">
-  <div class="tarjeta-header">
-    <div class="brand-info">
-      <img src="/static/disenos/prueba/logo.svg" alt="Logo {{ com.nombre if com else 'Negocio' }}" class="tarjeta-logo" />
-      <div>
-        <h2 id="prueba-t" class="tarjeta-titulo">{{ com.nombre if com else 'Tarjeta de Fidelización' }}</h2>
-        <span class="tarjeta-subtitulo">Suma sellos y obtené recompensas</span>
-      </div>
+{# prueba · «Alzá vuelo»: cada visita suma una pluma al ala, como en el logo. Al completar el ala, el pájaro llega al premio.
+   Variables: sellos, tarjeta, sumo (¿recién sumó?), premio_tarjeta, c, t (tema), com, diseno (logo). #}
+{%- set n = tarjeta -%}
+{%- set abanico = [150, 16 * (n - 1)]|min -%}
+{%- set paso = abanico / (n - 1) if n > 1 else 0 -%}
+{%- set orden = [5, 4, 3, 6, 0, 1, 7, 2] -%}
+{%- set completa = sellos >= n -%}
+{%- set avance = [100, (100 * sellos / n)|round|int]|min -%}
+<section class="tarjeta pv-tarjeta{{ ' pv-completa' if completa }}" aria-labelledby="pv-t">
+  <div class="pv-cabeza">
+    {% if diseno.logo %}<img class="pv-logo" src="{{ diseno.logo }}" alt="" width="46" height="46">{% else %}<span class="pv-logo pv-logo-txt">{{ t.icono }}</span>{% endif %}
+    <div class="pv-titulos">
+      <p class="pv-eyebrow">Pasaporte de vuelo</p>
+      <h2 id="pv-t">{% if completa %}¡Alzaste vuelo!{% else %}Cada visita, una pluma{% endif %}</h2>
     </div>
-    <div class="badge-progreso">
-      <span class="sellos-count">{{ sellos }}</span> / {{ tarjeta }}
-    </div>
+    <span class="pv-contador"><b>{{ sellos }}</b>/{{ n }}</span>
   </div>
 
-  <div class="tarjeta-body">
-    <ol class="prueba-sellos" role="img" aria-label="{{ sellos }} de {{ tarjeta }} sellos">
-      {% for i in range(tarjeta) %}
-        <li class="sello-item {{ 'on' if i < sellos }}{{ ' nuevo' if i == sellos - 1 and sumo }}" data-step="{{ i + 1 }}">
-          <div class="sello-inner">
-            {% if i < sellos %}
-              <span class="sello-icono">{{ t.icono if t and t.icono else '★' }}</span>
-            {% else %}
-              <span class="sello-numero">{{ i + 1 }}</span>
-            {% endif %}
-          </div>
-        </li>
-      {% endfor %}
-    </ol>
+  <svg class="pv-ala" viewBox="0 0 320 214" role="img" aria-label="{{ sellos }} de {{ n }} plumas">
+    <defs>
+      {%- for a, b in [('#3b1a8f', '#8a3cf0'), ('#6a2bd9', '#e13cc0'), ('#e13cc0', '#ffa24a'), ('#2a46c9', '#2fd0e8'),
+                       ('#16a9c4', '#3ee08f'), ('#24b884', '#b4ec3c'), ('#1f6fd9', '#3fdcf2'), ('#7b2ff0', '#ff6fd8')] %}
+      <linearGradient id="pv-g{{ loop.index0 }}" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="{{ a }}"/><stop offset="1" stop-color="{{ b }}"/></linearGradient>
+      {%- endfor %}
+      <radialGradient id="pv-cuerpo" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#a66bff"/><stop offset=".6" stop-color="#5b2bd6"/><stop offset="1" stop-color="#2a1170"/></radialGradient>
+    </defs>
+    {% for i in range(n) %}
+    {%- set ang = -abanico / 2 + paso * i -%}
+    {%- set largo = 150 if i % 2 == 0 else 128 -%}
+    <g transform="translate(160 196) rotate({{ ang|round(2) }})" class="pv-pluma{{ ' on' if i < sellos }}{{ ' nueva' if i == sellos - 1 and sumo }}" style="--i:{{ i }}">
+      <path d="M0 0 C -15 -{{ (largo * 0.3)|round|int }} -15 -{{ (largo * 0.72)|round|int }} 0 -{{ largo }} C 15 -{{ (largo * 0.72)|round|int }} 15 -{{ (largo * 0.3)|round|int }} 0 0 Z"
+            {% if i < sellos %}fill="url(#pv-g{{ orden[(i * 8 // n) % 8] }})"{% endif %}/>
+      <path class="pv-raquis" d="M0 -6 L0 -{{ largo - 14 }}"/>
+    </g>
+    {% endfor %}
+    <circle class="pv-cuerpo" cx="160" cy="196" r="15" fill="url(#pv-cuerpo)"/>
+    <text x="160" y="201" text-anchor="middle" class="pv-cuerpo-txt">{{ t.icono }}</text>
+  </svg>
+
+  <div class="pv-ruta" aria-hidden="true">
+    <div class="pv-estela"><i style="width:{{ avance }}%"></i></div>
+    <span class="pv-pajaro" style="left:{{ avance }}%">{% if diseno.logo %}<img src="{{ diseno.logo }}" alt="" width="30" height="30">{% else %}🕊{% endif %}</span>
+    <span class="pv-meta">🎁</span>
   </div>
 
-  <div class="tarjeta-footer {{ 'completada' if sellos >= tarjeta }}">
-    {% if sellos >= tarjeta %}
-      <div class="premio-banner anim-pulse">
-        <span class="premio-icon">🎁</span>
-        <div>
-          <strong>¡Felicidades, tarjeta completa!</strong>
-          <p>Pedí tu premio: <span>{{ premio_tarjeta }}</span></p>
-        </div>
-      </div>
-    {% else %}
-      <div class="premio-info">
-        <span class="premio-icon">🎯</span>
-        <p>Te faltan <strong>{{ tarjeta - sellos }}</strong> {{ 'sello' if (tarjeta - sellos) == 1 else 'sellos' }} para desbloquear: <span>{{ premio_tarjeta }}</span></p>
-      </div>
-    {% endif %}
-  </div>
+  <p class="pv-pie">{% if completa %}Pedí tu premio en caja: <b>{{ premio_tarjeta }}</b>{% else %}Te {{ 'falta' if n - sellos == 1 else 'faltan' }} <b>{{ n - sellos }}</b> {{ 'pluma' if n - sellos == 1 else 'plumas' }} para <b>{{ premio_tarjeta }}</b>{% endif %}</p>
+  {% if completa %}<div class="pv-confeti" aria-hidden="true">{% for k in range(10) %}<i style="--k:{{ k }}"></i>{% endfor %}</div>{% endif %}
 </section>
