@@ -45,10 +45,10 @@ def ip():
     return request.remote_addr or "?"
 
 
-def bloqueado(ambito):
+def bloqueado(ambito, maximo=MAX_FALLOS, ventana=VENTANA):
     n = db().execute("SELECT COUNT(*) FROM intentos_login WHERE clave=? AND creado>?",
-                     (f"{ambito}:{ip()}", ahora() - VENTANA)).fetchone()[0]
-    return n >= MAX_FALLOS
+                     (f"{ambito}:{ip()}", ahora() - ventana)).fetchone()[0]
+    return n >= maximo
 
 
 def registrar_fallo(ambito):
@@ -62,11 +62,13 @@ def es_plataforma():
     return session.get("rol") == "plataforma"
 
 
-def iniciar(rol, slug=None):
+def iniciar(rol, slug=None, nivel=None):
     session.clear()  # sesión nueva en cada ingreso
     session["rol"] = rol
     if slug:
         session["negocio"] = slug
+    if nivel:
+        session["nivel"] = nivel  # 'dueno' ve todo; 'caja' solo valida visitas y entrega premios
     session.permanent = True
     token_csrf()
 
@@ -77,11 +79,30 @@ def verificar_plataforma(clave):
 
 
 def verificar_negocio(com, clave):
-    return bool(com["clave_hash"]) and check_password_hash(com["clave_hash"], clave)
+    """Devuelve 'dueno', 'caja' o None según la clave escrita."""
+    if com["clave_hash"] and check_password_hash(com["clave_hash"], clave):
+        return "dueno"
+    if com["clave_caja_hash"] and check_password_hash(com["clave_caja_hash"], clave):
+        return "caja"
+    return None
+
+
+def actor_actual():
+    if es_plataforma():
+        return "plataforma"
+    if session.get("rol") == "negocio":
+        return f"{'dueno' if session.get('nivel') == 'dueno' else 'caja'}:{session.get('negocio')}"
+    return "anonimo"
 
 
 def destino_seguro(destino, defecto):
-    return destino if destino and destino.startswith("/") and not destino.startswith("//") else defecto
+    """Solo se acepta una dirección interna sencilla: nada de esquemas, dominios, barras invertidas ni caracteres de control."""
+    if not destino or not destino.startswith("/") or destino.startswith("//") or "\\" in destino:
+        return defecto
+    if any(ord(ch) < 32 for ch in destino):
+        return defecto
+    p = urlparse(destino)
+    return destino if not p.scheme and not p.netloc else defecto
 
 
 def requiere_plataforma(f):
@@ -93,13 +114,19 @@ def requiere_plataforma(f):
     return w
 
 
-def requiere_negocio(f):
-    """Cada negocio solo entra a lo suyo; la plataforma puede entrar a cualquiera (soporte)."""
-    @wraps(f)
-    def w(slug, *a, **k):
-        com = comercio(slug)
-        if not (es_plataforma() or (session.get("rol") == "negocio" and session.get("negocio") == slug)):
-            return redirect(url_for("negocio.ingresar", slug=slug, siguiente=request.full_path.rstrip("?")))
-        g.com = com
-        return f(slug, *a, **k)
-    return w
+def requiere_negocio(f=None, *, caja=False):
+    """Cada negocio solo entra a lo suyo; la plataforma puede entrar a cualquiera (soporte).
+    Las pantallas de caja las puede usar el personal; todo lo demás es solo del dueño."""
+    def decorador(f):
+        @wraps(f)
+        def w(slug, *a, **k):
+            com = comercio(slug)
+            propio = session.get("rol") == "negocio" and session.get("negocio") == slug
+            if not (es_plataforma() or propio):
+                return redirect(url_for("negocio.ingresar", slug=slug, siguiente=request.full_path.rstrip("?")))
+            if propio and not caja and session.get("nivel") != "dueno":
+                abort(403)
+            g.com = com
+            return f(slug, *a, **k)
+        return w
+    return decorador(f) if f else decorador

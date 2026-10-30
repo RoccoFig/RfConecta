@@ -7,7 +7,7 @@
 {%- endmacro %}
 
 {% macro estado(e) -%}
-{%- set m = {'activo': ['ok', 'Activo'], 'suspendido': ['bad', 'Suspendido'], 'pendiente': ['warn', 'Pendiente'], 'usado': ['ok', 'Entregado']} -%}
+{%- set m = {'activo': ['ok', 'Activo'], 'suspendido': ['bad', 'Suspendido'], 'pendiente': ['warn', 'Pendiente'], 'usado': ['ok', 'Entregado'], 'cancelado': ['', 'Cancelado'], 'vencido': ['bad', 'Vencido']} -%}
 {%- set x = m.get(e, ['', e]) -%}<span class="badge {{ x[0] }}">{{ x[1] }}</span>
 {%- endmacro %}
 

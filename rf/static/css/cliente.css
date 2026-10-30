@@ -24,3 +24,5 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid var(-
 .sello{aspect-ratio:1;border:2px dashed var(--linea);border-radius:50%;display:grid;place-items:center;font-weight:800;color:#8a8a8a;font-size:1.3rem}
 .sello.on{background:var(--acento);border:2px solid var(--tinta);color:var(--tinta)}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.aviso.info{border-left-color:var(--linea)}.aviso.ok{border-left-color:#1b8a57}
+.qr{width:100%;height:auto;display:block}

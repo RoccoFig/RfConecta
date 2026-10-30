@@ -1,12 +1,12 @@
 """Panel de RF: administración de todos los negocios, clientes, actividad, canjes y carteles."""
-import json, os, re, sqlite3, unicodedata
-from flask import Blueprint, abort, current_app, flash, redirect, render_template, request, session, url_for
-from werkzeug.security import generate_password_hash
+import io, json, os, re, sqlite3, time, unicodedata
+from flask import Blueprint, Response, abort, current_app, flash, redirect, render_template, request, session, url_for
+from werkzeug.security import check_password_hash, generate_password_hash
 from . import motor, temas
-from .db import DB_PATH, db, ahora
+from .db import ahora, db, ruta
 from .graficos import barras
 from .presentacion import info_diseno, tema_de
-from .seguridad import (admin_password, bloqueado, destino_seguro, es_plataforma, iniciar, registrar_fallo,
+from .seguridad import (actor_actual, admin_password, bloqueado, destino_seguro, es_plataforma, iniciar, registrar_fallo,
                         requiere_plataforma, verificar_plataforma)
 
 bp = Blueprint("plataforma", __name__, url_prefix="/plataforma")
@@ -14,7 +14,7 @@ bp = Blueprint("plataforma", __name__, url_prefix="/plataforma")
 RUBROS = ["Cafetería", "Heladería", "Restaurante", "Panadería", "Gimnasio", "Indumentaria", "Peluquería", "Kiosco", "Otro"]
 NAV = [(None, [("resumen", "Resumen", "layout-dashboard"), ("negocios", "Negocios", "store"), ("clientes", "Clientes", "users")]),
        ("Operación", [("actividad", "Actividad", "activity"), ("canjes", "Canjes", "gift"), ("carteles", "Carteles NFC", "nfc")]),
-       ("Sistema", [("ajustes", "Ajustes", "settings")])]
+       ("Sistema", [("seguridad", "Seguridad", "shield-check"), ("ajustes", "Ajustes", "settings")])]
 
 
 @bp.context_processor
@@ -58,9 +58,11 @@ def ingresar():
             error = "Demasiados intentos. Esperá unos minutos y probá de nuevo."
         elif verificar_plataforma(request.form.get("clave", "")):
             iniciar("plataforma")
+            motor.auditar("ingreso", "info", "plataforma")
             return redirect(destino_seguro(request.form.get("siguiente"), url_for("plataforma.resumen")))
         else:
             registrar_fallo("plataforma")
+            motor.auditar("ingreso_fallido", "alerta", "anonimo", None, None, "contraseña de la plataforma incorrecta")
             error = "Contraseña incorrecta."
     return render_template("panel/ingresar.html", titulo="Ingresar", encabezado="Panel de RF",
                            texto="Administrá todos los negocios de la plataforma.", error=error,
@@ -170,7 +172,7 @@ def negocio_estado(slug):
     com = motor.comercio(slug)
     nuevo = "suspendido" if com["estado"] == "activo" else "activo"
     db().execute("UPDATE comercios SET estado=? WHERE id=?", (nuevo, com["id"]))
-    db().commit()
+    motor.auditar("negocio_suspendido" if nuevo == "suspendido" else "negocio_reactivado", "aviso", "plataforma", com["id"])
     flash("Programa suspendido: los clientes ven un aviso." if nuevo == "suspendido" else "Programa reactivado.", "ok")
     return _volver(slug, "configuracion")
 
@@ -179,13 +181,16 @@ def negocio_estado(slug):
 @requiere_plataforma
 def negocio_clave(slug):
     com = motor.comercio(slug)
-    clave = request.form.get("clave", "")
+    clave, tipo = request.form.get("clave", ""), ("clave_caja_hash" if request.form.get("tipo") == "caja" else "clave_hash")
+    otro = "clave_hash" if tipo == "clave_caja_hash" else "clave_caja_hash"
     if len(clave) < 8:
         flash("La clave debe tener al menos 8 caracteres.", "error")
+    elif com[otro] and check_password_hash(com[otro], clave):
+        flash("La clave de caja y la del dueño tienen que ser distintas.", "error")
     else:
-        db().execute("UPDATE comercios SET clave_hash=? WHERE id=?", (generate_password_hash(clave), com["id"]))
-        db().commit()
-        flash("Clave del dueño actualizada.", "ok")
+        db().execute(f"UPDATE comercios SET {tipo}=? WHERE id=?", (generate_password_hash(clave), com["id"]))
+        motor.auditar("clave_cambiada", "aviso", "plataforma", com["id"], "caja" if tipo == "clave_caja_hash" else "dueno")
+        flash("Clave de caja actualizada." if tipo == "clave_caja_hash" else "Clave del dueño actualizada.", "ok")
     return _volver(slug, "configuracion")
 
 
@@ -249,6 +254,8 @@ def carteles():
             flash("Elegí un negocio y escribí el UID completo (14 caracteres).", "error")
         else:
             cur = db().execute("INSERT OR IGNORE INTO tags(comercio_id,uid) VALUES(?,?)", (com["id"], uid))
+            if cur.rowcount:
+                motor.auditar("cartel_registrado", "info", "plataforma", com["id"], f"uid:{uid}")
             db().commit()
             flash("Cartel registrado." if cur.rowcount else "Ese cartel ya estaba registrado.", "ok" if cur.rowcount else "error")
         return redirect(url_for("plataforma.carteles"))
@@ -260,7 +267,9 @@ def carteles():
 @bp.post("/carteles/<int:tag_id>/estado")
 @requiere_plataforma
 def carteles_estado(tag_id):
-    db().execute("UPDATE tags SET activo=1-activo WHERE id=?", (tag_id,))
+    cur = db().execute("UPDATE tags SET activo=1-activo WHERE id=?", (tag_id,))
+    if cur.rowcount:
+        motor.auditar("cartel_activado_o_desactivado", "aviso", "plataforma", None, f"tag:{tag_id}")
     db().commit()
     flash("Estado del cartel actualizado.", "ok")
     return redirect(url_for("plataforma.carteles"))
@@ -270,8 +279,8 @@ def carteles_estado(tag_id):
 @requiere_plataforma
 def ajustes():
     en_render = bool(os.environ.get("RENDER"))
-    tam = os.path.getsize(DB_PATH) if os.path.exists(DB_PATH) else 0
-    persistente = os.path.abspath(DB_PATH).startswith("/var/data")
+    tam = os.path.getsize(ruta()) if os.path.exists(ruta()) else 0
+    persistente = os.path.abspath(ruta()).startswith("/var/data")
     cfg = current_app.config
     revisiones = [
         ("Clave de sesiones", bool(os.environ.get("SECRET_KEY")), "Configurada." if os.environ.get("SECRET_KEY") else "Falta SECRET_KEY: las sesiones usan una clave de desarrollo."),
@@ -280,9 +289,39 @@ def ajustes():
          "Configuradas: los carteles firmados funcionan." if cfg["SDM_META_KEY"] else "Faltan SDM_META_KEY y SDM_FILE_KEY: ningún cartel real puede sumar sellos."),
         ("Modo desarrollo apagado", os.environ.get("MODO_DEV") != "1", "Apagado." if os.environ.get("MODO_DEV") != "1" else "MODO_DEV=1 permite sumar sellos sin cartel. Quitalo en producción."),
         ("Conexión segura (HTTPS)", request.is_secure, "Activa." if request.is_secure else "Estás usando HTTP. En producción debe ser HTTPS."),
-        ("Datos en disco persistente", persistente or not en_render, f"{DB_PATH} · {tam // 1024} KB" + ("" if persistente or not en_render else " — sin disco persistente los datos se pierden al reiniciar.")),
-        ("Tiempo entre sellos", motor.COOLDOWN_HORAS >= 1, f"{motor.COOLDOWN_HORAS:g} h entre visitas del mismo cliente." + ("" if motor.COOLDOWN_HORAS >= 1 else " Es muy bajo: es para pruebas.")),
+        ("Datos en disco persistente", persistente or not en_render, f"{ruta()} · {tam // 1024} KB" + ("" if persistente or not en_render else " — sin disco persistente los datos se pierden al reiniciar.")),
+        ("Tiempo entre sellos", motor.INTERVALO_HORAS >= 1, f"{motor.INTERVALO_HORAS:g} h entre visitas del mismo cliente (cada negocio puede cambiarlo)." + ("" if motor.INTERVALO_HORAS >= 1 else " Es muy bajo: es para pruebas.")),
+        ("Integridad de los datos", not (problemas := motor.verificar_integridad()),
+         "Saldos, canjes e historial son coherentes." if not problemas else "; ".join(problemas)),
         ("Mensajes por WhatsApp", False, "En modo de prueba: los códigos de ingreso salen por el registro del servidor, no llegan al cliente."),
     ]
     return render_template("plataforma/ajustes.html", titulo="Ajustes", subtitulo="Estado de la plataforma y de su configuración.",
                            revisiones=revisiones, k=motor.kpis())
+
+
+# ---------- seguridad y respaldo ----------
+@bp.route("/seguridad")
+@requiere_plataforma
+def seguridad():
+    cid, slug, _, pagina = _filtros()
+    nivel, accion = request.args.get("nivel", ""), request.args.get("accion", "").strip()[:40]
+    r = motor.auditoria_lista(nivel or None, accion or None, cid, pagina)
+    ind = motor.indicadores_seguridad(7)
+    acciones = [a[0] for a in db().execute("SELECT DISTINCT accion FROM auditoria ORDER BY accion").fetchall()]
+    return render_template("plataforma/seguridad.html", titulo="Seguridad", subtitulo="Registro de lo que pasa en la plataforma y señales para revisar.",
+                           r=r, ind=ind, nivel=nivel, accion=accion, slug=slug, acciones=acciones, lista_negocios=_lista_negocios())
+
+
+@bp.post("/respaldo")
+@requiere_plataforma
+def respaldo():
+    """Descarga una copia consistente de toda la base. Contiene datos personales: guardala en un lugar privado."""
+    origen = sqlite3.connect(ruta())
+    copia = sqlite3.connect(":memory:")
+    origen.backup(copia)
+    origen.close()
+    datos = copia.serialize()
+    copia.close()
+    motor.auditar("respaldo_descargado", "aviso", "plataforma")
+    nombre = f"respaldo-rf-{time.strftime('%Y%m%d-%H%M', time.gmtime(ahora() - 10800))}.db"
+    return Response(bytes(datos), mimetype="application/octet-stream", headers={"Content-Disposition": f"attachment; filename={nombre}"})

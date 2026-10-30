@@ -6,14 +6,21 @@
 <form method="post" action="{{ ruta('ajustes_reglas') }}">{{ csrf_input() }}<div class="form-g">
 <label class="campo"><span>Puntos por visita</span><input name="puntos_visita" type="number" min="1" max="1000" value="{{ r.puntos }}" required></label>
 <label class="campo"><span>Sellos para completar la tarjeta</span><input name="sellos_tarjeta" type="number" min="2" max="20" value="{{ r.sellos }}" required></label>
-<label class="campo ancho"><span>Premio al completar la tarjeta</span><input name="premio_tarjeta" value="{{ r.premio }}" required maxlength="60"></label></div>
-<p style="color:var(--muted);margin-bottom:14px">Si cambiás la cantidad de sellos, las tarjetas que tus clientes tienen en curso se recalculan.</p><button class="btn acento">Guardar reglas</button></form></div></section>
+<label class="campo ancho"><span>Premio al completar la tarjeta</span><input name="premio_tarjeta" value="{{ r.premio }}" required maxlength="60"></label>
+<label class="campo"><span>Horas mínimas entre dos visitas <small>(1 a 720)</small></span><input name="intervalo_horas" type="number" min="1" max="720" step="1" value="{{ cfg.intervalo|int }}" required></label>
+<label class="campo"><span>Máximo de visitas por día <small>(0 = sin tope)</small></span><input name="max_visitas_dia" type="number" min="0" max="20" value="{{ cfg.max_dia }}" required></label>
+<label class="campo ancho"><span>Días que dura un premio canjeado antes de vencer</span><input name="canje_vence_dias" type="number" min="1" max="365" value="{{ cfg.vence_dias }}" required></label></div>
+<p style="color:var(--muted);margin-bottom:14px">Estas reglas se aplican igual a los carteles NFC y al QR en caja. Si cambiás la cantidad de sellos, las tarjetas que tus clientes tienen en curso se recalculan.</p><button class="btn acento">Guardar reglas</button></form></div></section>
 <aside class="panel c5"><div class="panel-h"><h2>Cómo funciona</h2></div><div class="panel-c"><p style="margin-bottom:10px">Cada vez que un cliente apoya el celular en tu cartel suma <b>{{ r.puntos }} puntos</b> y <b>1 sello</b>. Hay un tiempo de espera entre visitas para evitar abusos.</p><p style="color:var(--muted)">Al completar los {{ r.sellos }} sellos, el cliente gana automáticamente <b>{{ r.premio }}</b>.</p></div></aside></div>
 {% else %}
 <div class="rejilla"><section class="panel c6"><div class="panel-h"><h2>Cambiar la clave</h2></div><div class="panel-c">
 <form method="post" action="{{ ruta('ajustes_clave') }}">{{ csrf_input() }}
 {% if not soporte %}<label class="campo"><span>Clave actual</span><input type="password" name="actual" required autocomplete="current-password"></label>{% endif %}
 <label class="campo"><span>Clave nueva <small>(mínimo 8 caracteres)</small></span><input type="password" name="nueva" required minlength="8" autocomplete="new-password"></label><button class="btn">Actualizar clave</button></form></div></section>
+<section class="panel c6"><div class="panel-h"><div><h2>Clave de caja</h2><p class="sub">Para el personal: solo ve la pantalla Caja.</p></div>{% if tiene_caja %}<span class="badge ok">Configurada</span>{% else %}<span class="badge warn">Sin configurar</span>{% endif %}</div><div class="panel-c">
+<form method="post" action="{{ ruta('ajustes_clave') }}">{{ csrf_input() }}<input type="hidden" name="tipo" value="caja">
+{% if not soporte %}<label class="campo"><span>Tu clave de dueño</span><input type="password" name="actual" required autocomplete="current-password"></label>{% endif %}
+<label class="campo"><span>Clave de caja nueva <small>(mínimo 8 caracteres, distinta de la tuya)</small></span><input type="password" name="nueva" required minlength="8" autocomplete="new-password"></label><button class="btn">Guardar clave de caja</button></form></div></section>
 <aside class="panel c6"><div class="panel-h"><h2>Tu negocio</h2></div><div class="panel-c"><div class="estado-lista"><div class="e"><div><small>Nombre</small><b>{{ com.nombre }}</b></div></div><div class="e"><div><small>Pantalla de tus clientes</small><b>/l/{{ com.slug }}</b></div></div></div>
 <p style="color:var(--muted);margin-top:14px">Para cambiar el nombre, el logo o el diseño, escribinos.</p></div></aside></div>
 {% endif %}

@@ -1,0 +1,17 @@
+{% extends "panel/layout.html" %}{% import "panel/_ui.html" as ui with context %}
+{% block acciones %}<a class="btn acento" href="{{ ruta('qr_imprimible') }}" target="_blank">{{ ui.ico('download') }}Versión para imprimir</a>{% endblock %}
+{% block cuerpo %}
+<div class="rejilla"><section class="panel c5"><div class="panel-h"><h2>Tu código QR</h2></div><div class="panel-c" style="text-align:center">
+  <div style="max-width:300px;margin:0 auto;background:#fff;padding:6px;border-radius:12px">{{ qr_svg }}</div>
+  <p class="mono" style="word-break:break-all;margin:12px 0">{{ url }}</p>
+  <div class="acciones" style="justify-content:center"><a class="btn" href="{{ ruta('qr_png') }}">{{ ui.ico('download') }}PNG</a><a class="btn sec" href="{{ ruta('qr_svg') }}">{{ ui.ico('download') }}SVG</a>
+  <button class="btn sec" data-copiar="{{ url }}">{{ ui.ico('copy') }}Copiar link</button></div></div></section>
+<aside class="panel c7"><div class="panel-h"><h2>Cómo funciona</h2></div><div class="panel-c">
+  <ol style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:8px">
+    <li>El cliente escanea el QR y se abre <b>la tarjeta de {{ com.nombre }}</b>. Abrirla <b>no suma puntos</b>.</li>
+    <li>Para sumar una visita toca <b>«Registrar mi visita en caja»</b> y te muestra un código de 5 minutos.</li>
+    <li>Vos lo confirmás desde <a href="{{ ruta('caja') }}">Caja</a>. Recién ahí se suman los puntos y el sello, una sola vez.</li></ol>
+  <hr style="border:0;border-top:1px solid var(--line);margin:16px 0">
+  <p style="color:var(--muted);margin-bottom:8px">Es un QR <b>permanente</b>: solo contiene la dirección pública de tu negocio. No lleva claves ni datos de clientes, así que podés imprimirlo y pegarlo sin riesgo.</p>
+  <p class="error-caja" style="margin:0">Antes de imprimir muchos carteles, confirmá con RF que la dirección de arriba es la definitiva: si cambia, los QR impresos dejarían de funcionar.</p></div></aside></div>
+{% endblock %}

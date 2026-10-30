@@ -29,11 +29,10 @@ def info_diseno(slug):
     est = os.path.join(current_app.static_folder, "disenos", slug)
     plantillas = sorted(f for f in os.listdir(tpl) if f.endswith(".html")) if os.path.isdir(tpl) else []
     archivos = sorted(os.listdir(est)) if os.path.isdir(est) else []
-    logo = next((f for f in archivos if re.fullmatch(r"logo\.(svg|png|jpe?g|webp)", f)), None)
     return dict(
         plantillas=plantillas, archivos=archivos, a_medida=bool(plantillas or archivos),
         estilo=url_for("static", filename=f"disenos/{slug}/estilo.css") if "estilo.css" in archivos else None,
-        logo=url_for("static", filename=f"disenos/{slug}/{logo}") if logo else None)
+        logo=url_for("static", filename=f"disenos/{slug}/logo.svg") if "logo.svg" in archivos else None)
 
 
 def iniciales(nombre):

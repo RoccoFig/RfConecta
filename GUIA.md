@@ -17,24 +17,33 @@
       templates/disenos/   UN DISEÑO A MEDIDA POR NEGOCIO (una carpeta por negocio)
       static/disenos/      estilos, logos e ilustraciones de cada negocio
     tools/nuevo_diseno.py  crea la carpeta de diseño de un negocio nuevo
-    tests/probar.py        pruebas automáticas
+    tools/respaldar.py     copia de seguridad verificada
+    tools/verificar_integridad.py   control de coherencia de saldos y canjes
+    tests/                 102 pruebas automáticas (pytest) y el simulador de carteles NFC
+    docs/AUDITORIA.md      informe de seguridad: hallazgos, correcciones, riesgos que quedan
+    docs/OPERACION.md      publicación, respaldos, retroceso y qué hacer ante una emergencia
 
 ## Direcciones
 
     /plataforma            panel de RF (contraseña = variable ADMIN_PASSWORD)
-    /negocio/<slug>        panel de cada negocio (clave propia, la define RF)
-    /l/<slug>              pantalla del cliente (la que abre el cartel)
+    /negocio/<slug>        panel de cada negocio: el dueño ve todo; la caja solo ve «Caja»
+    /negocio/<slug>/caja   confirmar visitas pedidas por QR y entregar premios
+    /negocio/<slug>/qr     descargar el QR del negocio (PNG, SVG y versión para imprimir)
+    /l/<slug>              entrada permanente del negocio (la del QR impreso). Abrirla NO suma puntos
     /t?picc_data=...       link firmado que escribe cada cartel NFC
+    /salud                 control de disponibilidad (no expone datos)
 
 ## Variables de entorno en Render (Environment)
 
-    ADMIN_PASSWORD   obligatoria. Contraseña del panel de RF.
-    SECRET_KEY       obligatoria. Texto largo y al azar. Firma las sesiones.
-    SDM_META_KEY     claves de los carteles NTAG 424 DNA (32 caracteres hexadecimales cada una)
+    ADMIN_PASSWORD     obligatoria. Contraseña del panel de RF.
+    SECRET_KEY         obligatoria. Texto largo y al azar. Firma las sesiones.
+    PUBLIC_BASE_URL    la dirección definitiva (https://...). Definila ANTES de imprimir QR.
+    SDM_META_KEY       claves de los carteles NTAG 424 DNA (32 caracteres hexadecimales cada una)
     SDM_FILE_KEY
-    DB_PATH          /var/data/puntos.db si usás disco persistente
-    COOLDOWN_HORAS   horas entre dos visitas que suman (por defecto 8)
-    MODO_DEV         NUNCA en producción: permite sumar sellos sin cartel
+    DB_PATH            /var/data/puntos.db con disco persistente
+    COOLDOWN_HORAS     horas mínimas entre visitas si el negocio no define las suyas (por defecto 8)
+    PYTHON_VERSION     recomendado: una 3.12 (es la versión con la que se probó)
+    MODO_DEV           NUNCA en producción: habilita /dev/escanear. Con RENDER la app se niega a arrancar si está.
 
 Si falta ADMIN_PASSWORD o SECRET_KEY en Render, la app se niega a arrancar a propósito.
 
@@ -53,7 +62,8 @@ Ejemplos reales: rf/templates/disenos/cafe-brasa y rf/templates/disenos/helados-
 
     pip install -r requirements.txt
     ADMIN_PASSWORD=algo MODO_DEV=1 python app.py          (en Windows: set ADMIN_PASSWORD=algo y set MODO_DEV=1)
-    python tests/probar.py                                (corre todas las pruebas con una base temporal)
+    pip install -r requirements-dev.txt
+    python -m pytest tests                                (corre todas las pruebas con una base temporal)
 
 Con MODO_DEV=1 podés abrir /dev/escanear/<slug> para simular que apoyás el celular en el cartel.
 

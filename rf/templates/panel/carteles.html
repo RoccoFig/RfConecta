@@ -1,5 +1,5 @@
 {% extends "panel/layout.html" %}{% import "panel/_ui.html" as ui with context %}
-{% block acciones %}<button class="btn acento" data-abrir="dlg-cartel">{{ ui.ico('plus') }}Registrar un cartel</button>{% endblock %}
+{% block acciones %}{% if not global_ %}<a class="btn sec" href="{{ ruta('qr_pagina') }}">{{ ui.ico('scan-line') }}Código QR del negocio</a>{% endif %}<button class="btn acento" data-abrir="dlg-cartel">{{ ui.ico('plus') }}Registrar un cartel</button>{% endblock %}
 {% block cuerpo %}
 <section class="panel"><div class="tabla-wrap">
 {% if tags %}<table class="tabla apilar"><thead><tr><th>UID del cartel</th>{% if global_ %}<th>Negocio</th>{% endif %}<th>Estado</th><th class="num">Lecturas</th><th>Último escaneo</th><th></th></tr></thead><tbody>

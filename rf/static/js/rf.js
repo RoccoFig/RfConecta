@@ -55,6 +55,9 @@
   // Avisos: desaparecen solos
   $$(".toast").forEach(t => setTimeout(() => { t.style.transition = "opacity .3s"; t.style.opacity = 0; setTimeout(() => t.remove(), 300); }, 5200));
 
+  // Imprimir (página del QR para imprimir)
+  $$("[data-imprimir]").forEach(b => b.addEventListener("click", () => window.print()));
+
   // Copiar al portapapeles
   $$("[data-copiar]").forEach(b => b.addEventListener("click", async () => {
     try { await navigator.clipboard.writeText(b.dataset.copiar); const t = b.textContent; b.textContent = "¡Copiado!"; setTimeout(() => b.textContent = t, 1400); } catch { /* sin permiso */ }

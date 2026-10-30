@@ -1,5 +1,5 @@
 {% extends "panel/layout.html" %}{% import "panel/_ui.html" as ui with context %}
-{% block acciones %}<a class="btn sec" href="{{ ruta('clientes') }}">{{ ui.ico('chevron-left') }}Volver a clientes</a>{% endblock %}
+{% block acciones %}<button class="btn sec" data-abrir="dlg-ajuste">{{ ui.ico('pencil') }}Ajustar puntos</button><a class="btn sec" href="{{ ruta('clientes') }}">{{ ui.ico('chevron-left') }}Volver a clientes</a>{% endblock %}
 {% block cuerpo %}
 <div class="rejilla">
   <div class="c3">{{ ui.kpi("Puntos", saldo, None, "sparkles") }}</div>
@@ -9,8 +9,8 @@
 </div>
 <div class="rejilla">
   <section class="panel c7"><div class="panel-h"><h2>Movimientos de puntos</h2></div><div class="panel-c sin"><div class="tabla-wrap">
-  {% if movs %}<table class="tabla apilar"><thead><tr><th>Cuándo</th><th>Motivo</th><th class="num">Puntos</th></tr></thead><tbody>
-  {% for m in movs %}<tr><td class="principal-c">{{ fecha(m.creado) }}</td><td data-et="Motivo">{{ 'Visita' if m.motivo == 'visita' else 'Canje de premio' }}</td><td class="num" data-et="Puntos"><b style="color:{{ 'var(--ok)' if m.delta > 0 else 'var(--bad)' }}">{{ '+' if m.delta > 0 }}{{ m.delta }}</b></td></tr>{% endfor %}</tbody></table>
+  {% if movs %}<table class="tabla apilar"><thead><tr><th>Cuándo</th><th>Motivo</th><th>Origen</th><th class="num">Puntos</th></tr></thead><tbody>
+  {% for m in movs %}<tr><td class="principal-c">{{ fecha(m.creado) }}</td><td data-et="Motivo">{{ {'visita': 'Visita', 'canje': 'Canje de premio', 'ajuste': 'Ajuste manual', 'devolucion': 'Devolución'}.get(m.motivo, m.motivo) }}{% if m.nota %}<small style="display:block;color:var(--muted)">{{ m.nota }}</small>{% endif %}</td><td data-et="Origen">{{ {'nfc': 'Cartel NFC', 'qr_caja': 'QR en caja', 'cliente': 'Cliente', 'manual': 'Manual', 'historico': 'Anterior', 'dev': 'Prueba'}.get(m.fuente, m.fuente or '—') }}</td><td class="num" data-et="Puntos"><b style="color:{{ 'var(--ok)' if m.delta > 0 else 'var(--bad)' }}">{{ '+' if m.delta > 0 }}{{ m.delta }}</b></td></tr>{% endfor %}</tbody></table>
   {% else %}{% call ui.vacio("Sin movimientos", "Todavía no sumó ni canjeó puntos.", "activity") %}{% endcall %}{% endif %}</div></div></section>
   <section class="panel c5"><div class="panel-h"><h2>Datos y canjes</h2></div><div class="panel-c">
   <div class="estado-lista"><div class="e"><div><small>Teléfono</small><b>{{ c.telefono }}</b></div></div>{% if c.email %}<div class="e"><div><small>Email</small><b>{{ c.email }}</b></div></div>{% endif %}</div>
@@ -18,4 +18,8 @@
   {% if canjes %}<ul class="feed">{% for k in canjes %}<li><span class="pt canje">{{ ui.ico('gift') }}</span><div><b>{{ k.premio }}</b><small class="mono">{{ k.codigo }}</small></div><span class="cuando">{{ ui.estado(k.estado) }}</span></li>{% endfor %}</ul>
   {% else %}<p style="color:var(--muted)">Todavía no canjeó premios.</p>{% endif %}</div></section>
 </div>
+{% call ui.dialogo("dlg-ajuste", "Ajustar puntos", "Registrar ajuste", ruta('cliente_ajustar', cliente_id=c.id)) %}
+<p style="margin-bottom:12px;color:var(--muted)">Para corregir un error. Queda en el historial con el motivo y quién lo hizo. Usá un número negativo para restar.</p>
+<label class="campo"><span>Puntos a sumar o restar</span><input name="puntos" type="number" min="-1000" max="1000" required placeholder="-10"></label>
+<label class="campo"><span>Motivo <small>(obligatorio)</small></span><input name="motivo" required minlength="3" maxlength="120" placeholder="Se cargó una visita por error"></label>{% endcall %}
 {% endblock %}

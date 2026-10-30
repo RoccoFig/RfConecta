@@ -36,10 +36,12 @@
 <button class="btn {{ 'peligro' if com.estado == 'activo' else 'acento' }}">{{ ui.ico('power') }}{{ 'Suspender programa' if com.estado == 'activo' else 'Reactivar programa' }}</button></form></div></section>
 <section class="panel"><div class="panel-h"><h2>Acceso del dueño</h2></div><div class="panel-c">
 <p style="margin-bottom:12px;color:var(--muted)">{{ 'Tiene una clave configurada.' if com.clave_hash else 'Todavía no tiene clave: no puede entrar a su panel.' }}</p>
-<button class="btn sec" data-abrir="dlg-clave">{{ ui.ico('key-round') }}Definir una clave nueva</button></div></section></div></div>
+<div class="acciones"><button class="btn sec" data-abrir="dlg-clave">{{ ui.ico('key-round') }}Clave del dueño</button><button class="btn sec" data-abrir="dlg-clave-caja">{{ ui.ico('key-round') }}Clave de caja</button></div></div></section></div></div>
 {% call ui.dialogo("dlg-clave", "Nueva clave del dueño", "Guardar clave", ruta('negocio_clave', slug=com.slug)) %}
 <label class="campo"><span>Clave nueva <small>(mínimo 8 caracteres)</small></span><input type="password" name="clave" required minlength="8" autocomplete="new-password"></label>{% endcall %}
 
+{% call ui.dialogo("dlg-clave-caja", "Nueva clave de caja", "Guardar clave", ruta('negocio_clave', slug=com.slug)) %}
+<input type="hidden" name="tipo" value="caja"><label class="campo"><span>Clave de caja <small>(mínimo 8 caracteres; distinta de la del dueño)</small></span><input type="password" name="clave" required minlength="8" autocomplete="new-password"></label>{% endcall %}
 {% elif tab == 'diseno' %}
 <div class="rejilla"><div class="c7" style="display:flex;flex-direction:column;gap:16px">
 <section class="panel"><div class="panel-h"><div><h2>Diseño a medida</h2><p class="sub">La pantalla que ve el cliente se programa para cada negocio.</p></div>{% if diseno.a_medida %}<span class="badge ok">A medida</span>{% else %}<span class="badge">Tema base</span>{% endif %}</div>
@@ -70,6 +72,7 @@
 <td class="acc"><form method="post" action="{{ ruta('carteles_estado', tag_id=t.id) }}">{{ csrf_input() }}<button class="btn sec chico">{{ ui.ico('power') }}{{ 'Desactivar' if t.activo else 'Activar' }}</button></form></td></tr>{% endfor %}</tbody></table>
 {% else %}{% call ui.vacio("Sin carteles", "Registrá el UID de cada cartel NFC para que pueda sumar sellos.", "nfc") %}{% endcall %}{% endif %}</div></div></section>
 <div class="c5" style="display:flex;flex-direction:column;gap:16px">
+<section class="panel"><div class="panel-h"><h2>Código QR del negocio</h2></div><div class="panel-c"><p style="color:var(--muted);margin-bottom:10px">Alternativa para quienes no pueden usar NFC.</p><a class="btn" href="{{ url_for('negocio.qr_pagina', slug=com.slug) }}">{{ ui.ico('scan-line') }}Ver y descargar el QR</a></div></section>
 <section class="panel"><div class="panel-h"><h2>Registrar un cartel</h2></div><div class="panel-c"><form method="post" action="{{ ruta('carteles') }}">{{ csrf_input() }}<input type="hidden" name="negocio" value="{{ com.slug }}">
 <label class="campo"><span>UID <small>(14 caracteres)</small></span><input name="uid" class="mono" required minlength="14" maxlength="23" autocomplete="off" placeholder="04DE5F1EACC040"></label><button class="btn">Registrar</button></form></div></section>
 <section class="panel"><div class="panel-h"><h2>Link para programar el cartel</h2></div><div class="panel-c"><p style="color:var(--muted);margin-bottom:10px">Es el mismo formato para todos los carteles de este negocio.</p>

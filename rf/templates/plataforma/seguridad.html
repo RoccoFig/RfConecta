@@ -1,0 +1,31 @@
+{% extends "panel/layout.html" %}{% import "panel/_ui.html" as ui with context %}
+{% block cuerpo %}
+{% set c = ind.cuentas %}
+<div class="rejilla">
+  <div class="c3">{{ ui.kpi("Visitas rechazadas", c.get('visita_rechazada', 0), "últimos 7 días · por intervalo o tope diario", "scan-line") }}</div>
+  <div class="c3">{{ ui.kpi("Escaneos inválidos", c.get('escaneo_rechazado', 0) + c.get('escaneo_repetido', 0) + c.get('escaneo_cartel_desconocido', 0), "firma falsa, repetido o cartel desconocido", "nfc") }}</div>
+  <div class="c3">{{ ui.kpi("Canjes rechazados", c.get('canje_rechazado', 0) + c.get('codigo_visita_invalido', 0), "códigos inexistentes, usados o vencidos", "ticket") }}</div>
+  <div class="c3">{{ ui.kpi("Ingresos fallidos", c.get('ingreso_fallido', 0) + c.get('ingreso_bloqueado', 0), "contraseñas incorrectas o bloqueos", "key-round") }}</div>
+</div>
+<div class="rejilla">
+  <section class="panel c6"><div class="panel-h"><div><h2>Para revisar</h2><p class="sub">Son señales, no acusaciones: un número alto pide mirar, no prueba fraude.</p></div></div><div class="panel-c">
+    {% if ind.reintentos %}<h3 style="font-size:14px;margin-bottom:8px">Clientes con 5 o más visitas rechazadas en la semana</h3><ul class="alertas">{% for r in ind.reintentos %}<li><div><b>{{ r.objetivo }}</b><small>{{ r.negocio or 'sin negocio' }} · {{ r.n }} intentos fuera de regla</small></div></li>{% endfor %}</ul>
+    {% else %}<p class="todo-ok">{{ ui.ico('circle-check') }}Nada raro en los últimos 7 días.</p>{% endif %}
+    {% if ind.ajustes %}<h3 style="font-size:14px;margin:16px 0 8px">Ajustes manuales de puntos</h3><ul class="feed">{% for a in ind.ajustes %}<li><span class="pt canje">{{ ui.ico('pencil') }}</span><div><b>{{ a.negocio or '—' }}</b><small>{{ a.detalle }} · {{ a.actor }}</small></div><span class="cuando">{{ hace(a.t) }}</span></li>{% endfor %}</ul>{% endif %}</div></section>
+  <section class="panel c6"><div class="panel-h"><h2>Cómo se protege la plataforma</h2></div><div class="panel-c"><ul style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px">
+    <li>El historial de puntos <b>no se puede modificar ni borrar</b>, ni siquiera desde la base de datos.</li><li>La base <b>rechaza</b> saldos negativos y canjes que ya se resolvieron.</li>
+    <li>Cada canje y cada visita se hace en una transacción: dos pedidos simultáneos no pueden ganar los dos.</li><li>Los códigos de premio vencen, son de 8 caracteres y se frenan tras 10 intentos fallidos.</li></ul></div></section>
+</div>
+<form class="toolbar" method="get" data-auto>
+  <select name="nivel" aria-label="Importancia"><option value="">Toda importancia</option>{% for k, v in [('info', 'Informativos'), ('aviso', 'Avisos'), ('alerta', 'Alertas')] %}<option value="{{ k }}" {{ 'selected' if k == nivel }}>{{ v }}</option>{% endfor %}</select>
+  <select name="accion" aria-label="Tipo de evento"><option value="">Todos los eventos</option>{% for a in acciones %}<option {{ 'selected' if a == accion }}>{{ a }}</option>{% endfor %}</select>
+  <select name="negocio" aria-label="Negocio"><option value="">Todos los negocios</option>{% for n in lista_negocios %}<option value="{{ n.slug }}" {{ 'selected' if n.slug == slug }}>{{ n.nombre }}</option>{% endfor %}</select>
+  <button class="btn sec">Filtrar</button></form>
+<section class="panel"><div class="tabla-wrap">
+{% if r.filas %}<table class="tabla apilar"><thead><tr><th>Cuándo</th><th>Evento</th><th>Quién</th><th>Negocio</th><th>Detalle</th><th>Origen</th></tr></thead><tbody>
+{% for a in r.filas %}<tr><td class="principal-c" title="{{ fecha(a.t) }}">{{ hace(a.t) }}</td><td data-et="Evento"><span class="badge {{ {'aviso': 'warn', 'alerta': 'bad'}.get(a.nivel, '') }}">{{ a.accion }}</span></td>
+<td data-et="Quién" class="mono">{{ a.actor or '—' }}</td><td data-et="Negocio">{{ a.negocio or '—' }}</td><td data-et="Detalle">{{ ((a.objetivo ~ ' · ') if a.objetivo else '') ~ (a.detalle or '') }}</td><td data-et="Origen" class="mono">{{ a.ip or '—' }}</td></tr>{% endfor %}</tbody></table>
+<div class="pie-tabla"><span>Página {{ r.pagina }} de {{ r.paginas }} · {{ r.total }} eventos</span>{{ ui.paginacion(r) }}</div>
+{% else %}{% call ui.vacio("Sin eventos", "Todavía no se registró nada con este filtro.", "shield-check") %}{% endcall %}{% endif %}
+</div></section>
+{% endblock %}

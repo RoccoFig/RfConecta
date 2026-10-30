@@ -36,4 +36,4 @@ ESTILO = '''/* __SLUG__ — estilo propio. Las variables --fondo, --tinta, --ace
 open(os.path.join(plantillas, "_tarjeta.html"), "w", encoding="utf-8").write(TARJETA.replace("__SLUG__", slug))
 open(os.path.join(estaticos, "estilo.css"), "w", encoding="utf-8").write(ESTILO.replace("__SLUG__", slug))
 print(f"Listo. Se crearon:\n  rf/templates/disenos/{slug}/_tarjeta.html\n  rf/static/disenos/{slug}/estilo.css\n"
-      f"Opcional: poné el logo en rf/static/disenos/{slug}/logo.svg (o .png/.jpg/.webp) y copiá rf/templates/cliente/home.html para rehacer toda la pantalla.")
+      f"Opcional: poné el logo en rf/static/disenos/{slug}/logo.svg y copiá rf/templates/cliente/home.html para rehacer toda la pantalla.")

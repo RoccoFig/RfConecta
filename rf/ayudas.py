@@ -25,10 +25,16 @@ def fecha(ts, hora=True):
     return time.strftime("%d/%m/%Y %H:%M" if hora else "%d/%m/%Y", time.gmtime(ts - 10800))
 
 
+def hora(ts):
+    return time.strftime("%H:%M", time.gmtime(ts - 10800)) if ts else "—"
+
+
 def pagina_url(n):
     args = {**request.view_args, **request.args.to_dict(), "pagina": n}
     return url_for(request.endpoint, **args)
 
 
 def registrar(app):
-    app.jinja_env.globals.update(hace=hace, fecha=fecha, pagina_url=pagina_url)
+    import secrets
+    app.jinja_env.globals.update(hace=hace, fecha=fecha, hora=hora, pagina_url=pagina_url, ahora=ahora,
+                                 nonce=lambda: secrets.token_urlsafe(12))

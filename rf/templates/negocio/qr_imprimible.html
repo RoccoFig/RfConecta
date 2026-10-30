@@ -1,0 +1,16 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex">
+<title>QR · {{ com.nombre }}</title>
+<style>
+:root{--fondo:{{ t.fondo }};--tinta:{{ t.tinta }};--acento:{{ t.acento }};--titulo:{{ t.titulo }}}
+*{box-sizing:border-box}body{margin:0;font:16px/1.5 {{ t.fuente }};background:#e9e8e1;color:var(--tinta);display:grid;place-items:center;min-height:100vh;padding:20px}
+.hoja{background:#fff;width:min(560px,100%);aspect-ratio:210/297;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:36px;text-align:center;border-top:14px solid var(--acento);box-shadow:0 10px 40px rgba(0,0,0,.15)}
+.hoja img,.hoja svg.logo,.hoja>svg:not(.qr){width:72px;height:72px}
+h1{font:700 2rem/1.1 var(--titulo);margin:0}p{margin:0}.pie{font-size:.95rem;opacity:.8}.url{font:600 .85rem ui-monospace,monospace;word-break:break-all;opacity:.7}
+.qr-caja{width:min(320px,70%);background:#fff}.qr-caja .qr{width:100%;height:auto;display:block}
+.barra{position:fixed;top:12px;right:12px;display:flex;gap:8px}.barra button{font:600 14px system-ui;padding:9px 14px;border-radius:8px;border:0;background:#111;color:#fff;cursor:pointer}
+@media print{body{background:#fff;padding:0;display:block;min-height:0}.hoja{box-shadow:none;width:100%;border-top-width:18px;min-height:100vh;aspect-ratio:auto}.barra{display:none}}
+</style></head><body>
+<div class="barra"><button data-imprimir>Imprimir o guardar como PDF</button></div>
+<main class="hoja">{{ logo }}<h1>{{ com.nombre }}</h1><p>Escaneá para ver tu tarjeta de lealtad</p>
+<div class="qr-caja">{{ qr_svg }}</div><p class="pie">Sumá puntos y sellos en cada visita y canjeá premios.</p><p class="url">{{ url }}</p></main>
+<script src="{{ url_for('static', filename='js/rf.js') }}" defer></script></body></html>
