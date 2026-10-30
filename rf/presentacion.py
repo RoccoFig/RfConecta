@@ -29,10 +29,19 @@ def info_diseno(slug):
     est = os.path.join(current_app.static_folder, "disenos", slug)
     plantillas = sorted(f for f in os.listdir(tpl) if f.endswith(".html")) if os.path.isdir(tpl) else []
     archivos = sorted(os.listdir(est)) if os.path.isdir(est) else []
+    def url(nombre):
+        # ?v=<fecha del archivo>: cuando cambiás el archivo, el navegador baja la versión nueva en vez de la guardada
+        try:
+            v = int(os.path.getmtime(os.path.join(est, nombre)))
+        except OSError:
+            v = 0
+        return url_for("static", filename=f"disenos/{slug}/{nombre}", v=v)
+
+    logo = next((f for f in ("logo.svg", "logo.png", "logo.webp", "logo.jpg", "logo.jpeg") if f in archivos), None)
     return dict(
         plantillas=plantillas, archivos=archivos, a_medida=bool(plantillas or archivos),
-        estilo=url_for("static", filename=f"disenos/{slug}/estilo.css") if "estilo.css" in archivos else None,
-        logo=url_for("static", filename=f"disenos/{slug}/logo.svg") if "logo.svg" in archivos else None)
+        estilo=url("estilo.css") if "estilo.css" in archivos else None,
+        logo=url(logo) if logo else None)
 
 
 def iniciales(nombre):

@@ -26,7 +26,14 @@ TARJETA = '''{# __SLUG__ · tarjeta de lealtad. Variables: sellos (los que tiene
   <p>{% if sellos >= tarjeta %}¡Completa! Pedí tu premio: {{ premio_tarjeta }}{% else %}Faltan {{ tarjeta - sellos }} para {{ premio_tarjeta }}{% endif %}</p>
 </section>
 '''
-ESTILO = '''/* __SLUG__ — estilo propio. Las variables --fondo, --tinta, --acento, --linea, --sup y --radio vienen del tema base. */
+ESTILO = '''/* __SLUG__ — estilo propio. Las variables --fondo, --tinta, --acento, --linea, --sup y --radio vienen del tema base.
+   Todo lo de abajo de body.d-__SLUG__ cambia la pantalla ENTERA del cliente (registro, entrar, home). Probá cambiar el color. */
+body.d-__SLUG__{background:var(--fondo)}
+body.d-__SLUG__ .marca{background:var(--tinta);color:var(--fondo)}
+body.d-__SLUG__ h1,body.d-__SLUG__ h2{font-family:var(--titulo)}
+body.d-__SLUG__ button{background:var(--acento);color:var(--tinta)}
+
+/* La tarjeta de sellos: solo se ve DESPUÉS de crear la cuenta / entrar (pantalla home). */
 .__SLUG__-sellos{list-style:none;margin:.5rem 0;padding:0;display:grid;grid-template-columns:repeat(4,1fr);gap:.6rem}
 .__SLUG__-sellos li{aspect-ratio:1;display:grid;place-items:center;border:2px dashed var(--linea);border-radius:var(--radio);font-weight:700}
 .__SLUG__-sellos li.on{background:var(--acento);border:2px solid var(--tinta);color:var(--tinta)}
