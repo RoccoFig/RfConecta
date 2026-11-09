@@ -1,3 +1,4 @@
+import pytest
 """Visitas, puntos y sellos: elegibilidad, idempotencia y las tres vías (NFC, QR en caja, atajo de pruebas)."""
 import re
 import simulador_nfc as nfc
@@ -187,3 +188,13 @@ def test_el_atajo_de_pruebas_no_existe_en_produccion(crear_app):
     import pytest
     with pytest.raises(RuntimeError):
         crear_app(RENDER="1", MODO_DEV="1")
+
+
+def test_sdm_link_real_con_enc():
+    """Link real de un NTAG 424 DNA con claves en cero y datos cifrados (&enc=)."""
+    from rf import sdm
+    uid, ctr = sdm.verificar("B71323C16AB79CA1E4DF039CE49EC7CB", "13ABC1EE4A2333F5",
+                             bytes(16), bytes(16), "6C4A114B464575AAD019D9BB066EBAC3")
+    assert (uid, ctr) == ("044D1DBA772390", 4)
+    with pytest.raises(ValueError):  # sin enc la firma no coincide
+        sdm.verificar("B71323C16AB79CA1E4DF039CE49EC7CB", "13ABC1EE4A2333F5", bytes(16), bytes(16))

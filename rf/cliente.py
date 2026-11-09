@@ -284,7 +284,7 @@ def escaneo():
         abort(503)
     try:
         uid, ctr = sdm.verificar(request.args.get("picc_data", ""), request.args.get("cmac", ""),
-                                 bytes.fromhex(meta), bytes.fromhex(archivo))
+                                 bytes.fromhex(meta), bytes.fromhex(archivo), request.args.get("enc", ""))
     except ValueError as e:
         motor.auditar("escaneo_rechazado", "aviso", "anonimo", None, None, str(e))
         abort(403)

@@ -17,14 +17,19 @@ def _cmac(clave, datos):
     return c.finalize()
 
 
-def verificar(picc_hex, cmac_hex, meta_key, file_key):
-    """Devuelve (uid_hex, contador) si el escaneo es auténtico. Si no, lanza ValueError."""
+def verificar(picc_hex, cmac_hex, meta_key, file_key, enc_hex=""):
+    """Devuelve (uid_hex, contador) si el escaneo es auténtico. Si no, lanza ValueError.
+
+    enc_hex: si el tag también manda datos cifrados (&enc=...), la firma cubre el texto
+    "<enc>&cmac=" tal como aparece en el link; sin enc, la firma es sobre un texto vacío.
+    """
     try:
         picc = bytes.fromhex(picc_hex)
         recibido = bytes.fromhex(cmac_hex)
+        enc = bytes.fromhex(enc_hex)
     except ValueError:
         raise ValueError("formato inválido")
-    if len(picc) != 16 or len(recibido) != 8:
+    if len(picc) != 16 or len(recibido) != 8 or len(enc) % 16 or len(enc) > 128:
         raise ValueError("largo inválido")
     d = Cipher(algorithms.AES(meta_key), modes.CBC(bytes(16))).decryptor()
     datos = d.update(picc) + d.finalize()
@@ -33,7 +38,8 @@ def verificar(picc_hex, cmac_hex, meta_key, file_key):
         raise ValueError("datos inesperados")
     uid, contador = datos[1:8], datos[8:11]
     sv2 = bytes([0x3C, 0xC3, 0x00, 0x01, 0x00, 0x80]) + uid + contador
-    completo = _cmac(_cmac(file_key, sv2), b"")
+    entrada = f"{enc_hex}&cmac=".encode() if enc_hex else b""
+    completo = _cmac(_cmac(file_key, sv2), entrada)
     esperado = bytes(completo[i] for i in range(1, 16, 2))
     if not hmac.compare_digest(esperado, recibido):
         raise ValueError("firma inválida")
