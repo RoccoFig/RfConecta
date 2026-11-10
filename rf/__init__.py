@@ -16,7 +16,7 @@ from .seguridad import csrf_input, proteger_pedido, token_csrf
 
 def create_app():
     app = Flask(__name__)
-    en_render = bool(os.environ.get("RENDER"))
+    en_render = bool(os.environ.get("RENDER") or os.environ.get("PRODUCCION"))  # Render o servidor propio
     secreto = os.environ.get("SECRET_KEY", "")
     if en_render and (not secreto or not os.environ.get("ADMIN_PASSWORD") or os.environ.get("MODO_DEV") == "1"):
         raise RuntimeError("Antes de publicar: definí SECRET_KEY y ADMIN_PASSWORD en Environment, y quitá MODO_DEV.")
@@ -34,7 +34,7 @@ def create_app():
         registro.setLevel(logging.INFO)
         registro.propagate = False
     if en_render:
-        app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1, x_for=1)  # detrás del proxy HTTPS de Render
+        app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1, x_for=1)  # detrás del proxy HTTPS (Render o Caddy)
 
     base.init_db()
     app.teardown_appcontext(base.cerrar)

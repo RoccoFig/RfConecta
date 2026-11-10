@@ -4,7 +4,7 @@ import os
 
 
 def enviar_whatsapp(tel, texto):
-    if os.environ.get("RENDER") and not os.environ.get("MOSTRAR_CODIGOS_EN_REGISTRO"):
+    if (os.environ.get("RENDER") or os.environ.get("PRODUCCION")) and not os.environ.get("MOSTRAR_CODIGOS_EN_REGISTRO"):
         print(f"[WHATSAPP -> ****{tel[-4:]}] (mensaje no enviado: WhatsApp real sin configurar)", flush=True)
         return
     print(f"[WHATSAPP -> {tel}] {texto}", flush=True)

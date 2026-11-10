@@ -38,6 +38,16 @@
     /t?picc_data=...       link firmado que escribe cada cartel NFC
     /salud                 control de disponibilidad (no expone datos)
 
+## Servidor propio (VPS con Ubuntu 24.04)
+
+    1. Apuntá el dominio (registro A) a la IP del servidor.
+    2. git clone <repo> /opt/rfconecta
+    3. sudo bash /opt/rfconecta/deploy/instalar.sh <dominio>
+    4. sudo nano /etc/rfconecta.env   (ADMIN_PASSWORD y claves SDM)  y  sudo systemctl restart rfconecta
+    Publicar cambios: sudo bash /opt/rfconecta/deploy/actualizar.sh
+    Las mismas variables de abajo van en /etc/rfconecta.env, más PRODUCCION=1 (cumple el papel de RENDER).
+    Respaldo diario automático en /var/data/respaldos (conserva 30). Logs: journalctl -u rfconecta
+
 ## Variables de entorno en Render (Environment)
 
     ADMIN_PASSWORD     obligatoria. Contraseña del panel de RF.

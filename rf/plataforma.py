@@ -284,7 +284,7 @@ def carteles_estado(tag_id):
 @bp.route("/ajustes")
 @requiere_plataforma
 def ajustes():
-    en_render = bool(os.environ.get("RENDER"))
+    en_render = bool(os.environ.get("RENDER") or os.environ.get("PRODUCCION"))  # Render o servidor propio
     tam = os.path.getsize(ruta()) if os.path.exists(ruta()) else 0
     persistente = os.path.abspath(ruta()).startswith("/var/data")
     cfg = current_app.config
